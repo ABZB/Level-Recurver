@@ -1,11 +1,3 @@
-import io
-import string
-import math
-from tkinter import *
-from tkinter.filedialog import askopenfilename
-from tkinter.filedialog import asksaveasfilename
-import binascii
-import os
 from gen_iii_booster import *
 from gen_iv_booster import *
 
@@ -32,7 +24,7 @@ def main(gen_number):
 	
 	
 	#Gen III
-	if(gen_number == 3.2)
+	if(gen_number == 3.2):
 		em = get_files_gen_iii()
 		
 		em, output_path = calc_iii(em)
