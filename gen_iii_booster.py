@@ -4,7 +4,7 @@ evolve_array_iii = [0,2,3,3,5,6,6,8,9,9,11,12,12,14,15,15,17,18,18,20,20,22,22,2
 evolve_level_barrier_array_iii = [0,16,32,0,16,36,0,16,36,0,7,10,0,7,10,0,18,36,0,20,0,20,0,22,0,100,0,22,0,16,21,0,16,21,0,5,0,50,0,5,0,22,27,21,26,0,24,0,31,0,26,0,28,0,33,0,28,0,5,0,25,30,0,16,21,0,28,33,0,21,26,0,30,0,25,30,0,40,0,37,0,30,35,0,31,0,34,0,38,0,5,0,25,30,0,5,26,0,28,0,30,0,5,0,28,0,0,0,5,35,0,42,47,52,57,0,32,37,33,0,5,0,0,0,0,5,10,0,0,20,0,0,0,0,0,0,0,30,40,0,40,0,0,0,0,0,0,30,55,0,0,0,16,32,0,14,36,0,18,30,0,15,0,20,0,18,0,22,0,0,27,0,10,10,10,10,30,25,0,15,30,0,0,18,0,0,0,18,27,0,40,5,0,5,40,0,0,0,40,0,40,0,0,0,31,0,0,40,0,23,0,0,0,0,0,30,30,0,38,0,33,38,0,25,0,0,0,0,24,0,0,25,0,40,0,0,20,0,30,30,30,0,0,0,0,0,30,55,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,36,0,16,36,0,16,36,0,18,0,20,0,7,10,0,10,0,14,19,0,14,19,0,20,0,0,22,0,23,0,0,25,0,22,0,40,0,20,0,0,36,0,30,0,0,30,0,0,30,0,5,0,30,0,35,45,0,24,0,26,0,33,0,32,44,0,32,0,42,0,0,0,15,32,0,0,0,0,37,0,35,0,15,37,42,36,18,36,0,26,0,0,20,40,0,5,0,0,0,37,0,0,0,0,32,42,0,0,0,0,40,0,40,0,20,30,0,30,50,0,20,45,0]
 
 
-double_array = [261,262,263,264,265,266,267,268,269,270,271,272,335,770,771,772,773,774,775,776,777,778,779,780,781,782,783,784,785,786,787,788,789,790,791,792,793,794,795,796,797,798,799,800,801]
+doubles_set = {261,262,263,264,265,266,267,268,269,270,271,272,335,770,771,772,773,774,775,776,777,778,779,780,781,782,783,784,785,786,787,788,789,790,791,792,793,794,795,796,797,798,799,800,801}
 
 
 def calc_iii(em):
@@ -33,12 +33,18 @@ def calc_iii(em):
 		#hold items and custom moves
 			pokemon_length = 16
 		
+		#If a trainer has 4 or more pokemon, or is a Gym Leader or E4 member, make it a double battle
+		
+		if(number_pokemon >= 4 or trainer_number in doubles_set):
+			em[trainer_pointer + 24] = 1
+		
+		
 		#iterate over that trainer's Pokemon
 		while True:
 			#get level
 			level = em[pokemon_pointer + 2]
 			#use level * (1 + level/50) = (level + (level^2/50)) = (50 * level + level ^2)/50. Level 10 has (500 + 100)/50 = 600/50 = 60/5 = 12, level 20 has 20*1.4 = 28, level 30 has 30*1.6 = 48, level 40 has 40*1.8 = 72, 50*2 = 100
-			level = round(level * (1 + level/50))
+			level = min(round(level * (1 + level/50)),100)
 			#write new level
 			em[pokemon_pointer + 2] = level
 			
@@ -58,16 +64,13 @@ def calc_iii(em):
 						
 						#convert back to hex pairs
 						low_digits = new_index%256
-						high_digits = (new_index - low_digits)/256
+						high_digits = int((new_index - low_digits)/256)
 						
 						#write
 						em[pokemon_pointer + 4] = low_digits
 						em[pokemon_pointer + 5] = high_digits
 			
 			
-			#Make Gym Leaders and E4 double battles
-			if(trainer_number in double_array):
-				em[trainer_pointer + 24] = 1
 		
 			#move pointer to next Pokemon
 			pokemon_pointer += pokemon_length
@@ -80,6 +83,7 @@ def calc_iii(em):
 				break
 			
 		
+		trainer_pointer += 40 #0x28
 		trainer_number += 1
 		#actual last trainer index is 854, but the last four seem to be dummies, so will not change them
 		if(trainer_number == 850):

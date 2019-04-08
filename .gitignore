@@ -1,0 +1,17 @@
+
+Trainer_Level_Booster.spec
+*.zip
+*.toc
+*.pyc
+*.pyc
+*.pyc
+*.pyo
+*.pkg
+*.pyc
+*.pyz
+*.manifest
+*.txt
+*.html
+*.exe
+*.pyc
+__pycache__/gen_iii_booster.cpython-36.pyc

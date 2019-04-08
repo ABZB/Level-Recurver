@@ -22,14 +22,12 @@ def main(gen_number):
 		except:
 			print("Problem with Gen number:", gen_number, type(gen_number))
 	
-	
 	#Gen III
 	if(gen_number == 3.2):
-		em = get_files_gen_iii()
+		em, output_path = get_files_gen_iii()
 		
-		em, output_path = calc_iii(em)
-		
-		file_name = "Emerald Scaled"
+		em = calc_iii(em)
+		file_name = "Emerald Scaled.gba"
 		
 		save_binary_file(em, file_name, output_path)
 
