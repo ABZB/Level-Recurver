@@ -30,6 +30,7 @@ def calc_iii(em):
 		#custom moves but no items
 		elif(extra_type == 2):
 			pokemon_length = 14
+		else:
 		#hold items and custom moves
 			pokemon_length = 16
 		
@@ -39,41 +40,55 @@ def calc_iii(em):
 			em[trainer_pointer + 24] = 1
 		
 		
+		#get the pointer to the trainer's first Pokemon (to check against iterated value)
+		t_pokemon_pointer = em[trainer_pointer + 36] + 256*em[trainer_pointer + 37] + 65536*em[trainer_pointer + 38]
+		
 		#iterate over that trainer's Pokemon
 		while True:
+			if(t_pokemon_pointer != pokemon_pointer):
+				print("calculated value is ", t_pokemon_pointer - pokemon_pointer, "less than t_pokemon_pointer")
+				pokemon_pointer = t_pokemon_pointer
+			
 			#get level
 			level = em[pokemon_pointer + 2]
 			#use level * (1 + level/50) = (level + (level^2/50)) = (50 * level + level ^2)/50. Level 10 has (500 + 100)/50 = 600/50 = 60/5 = 12, level 20 has 20*1.4 = 28, level 30 has 30*1.6 = 48, level 40 has 40*1.8 = 72, 50*2 = 100
-			level = min(round(level * (1 + level/50)),100)
-			#write new level
-			em[pokemon_pointer + 2] = level
+			
+			#final check for incorrect values
+			if(level <= 4 or level >= 79):
+				print("Found level of", level, "at", pokemon_pointer)
+				print(trainer_number)
+			else:
+				level = min(round(level * (1 + level/50)),100)
+				#write new level
+				em[pokemon_pointer + 2] = level
 			
 			
-			#If the Pokemon should be evolved, evolve it. Will evolve any unevolved Pokemon that is 5 or more levels above the minimum level
-			low_digits = em[pokemon_pointer + 4]
-			high_digits = em[pokemon_pointer + 5]
-			
-			index = low_digits + 256*high_digits
-			
-			#last Pokemon that can evolve by internal index number in gen III is Metang, at 399
-			if(index < 400):
-				#If the Pokemon is past the level it evolves at by level-up
-				if(level >= evolve_level_barrier_array_iii[index]):
-					new_index = evolve_array_iii[index]
-					if(new_index != index):
-						
-						#convert back to hex pairs
-						low_digits = new_index%256
-						high_digits = int((new_index - low_digits)/256)
-						
-						#write
-						em[pokemon_pointer + 4] = low_digits
-						em[pokemon_pointer + 5] = high_digits
+				#If the Pokemon should be evolved, evolve it. Will evolve any unevolved Pokemon that is 5 or more levels above the minimum level
+				low_digits = em[pokemon_pointer + 4]
+				high_digits = em[pokemon_pointer + 5]
+				
+				index = low_digits + 256*high_digits
+				
+				#last Pokemon that can evolve by internal index number in gen III is Metang, at 399
+				if(index < 400):
+					#If the Pokemon is past the level it evolves at by level-up
+					if(level >= evolve_level_barrier_array_iii[index]):
+						new_index = evolve_array_iii[index]
+						if(new_index != index):
+							
+							#convert back to hex pairs
+							low_digits = new_index%256
+							high_digits = int((new_index - low_digits)/256)
+							
+							#write
+							em[pokemon_pointer + 4] = low_digits
+							em[pokemon_pointer + 5] = high_digits
 			
 			
 		
 			#move pointer to next Pokemon
 			pokemon_pointer += pokemon_length
+			t_pokemon_pointer += pokemon_length
 			
 			#decrement party count of current trainer
 			number_pokemon -= 1
