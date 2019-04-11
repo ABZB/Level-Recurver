@@ -24,15 +24,17 @@ def calc_iii(em):
 		#Do the Pokemon have hold items? Custom moves?
 		extra_type = em[trainer_pointer]
 		
-		#none or only hold items
-		if(extra_type == 0 or extra_type == 1):
+		#none or custom hold items but not moves
+		if(extra_type == 0 or extra_type == 2):
 			pokemon_length = 8
 		#custom moves but no items
-		elif(extra_type == 2):
+		elif(extra_type == 1):
 			pokemon_length = 14
-		else:
+		elif(extra_type == 3):
 		#hold items and custom moves
 			pokemon_length = 16
+		else:
+			print("Trainer data error - incorrect value or incorrect pointer")
 		
 		#If a trainer has 4 or more pokemon, or is a Gym Leader or E4 member, make it a double battle
 		
@@ -43,8 +45,22 @@ def calc_iii(em):
 		#get the pointer to the trainer's first Pokemon (to check against iterated value)
 		t_pokemon_pointer = em[trainer_pointer + 36] + 256*em[trainer_pointer + 37] + 65536*em[trainer_pointer + 38]
 		
+		next_trainer_pointer = em[trainer_pointer + 36 + 40] + 256*em[trainer_pointer + 37 + 40] + 65536*em[trainer_pointer + 38 + 40]
+		
+		allocated_team_length = next_trainer_pointer - t_pokemon_pointer
+		
+		allocated_pokemon_length = allocated_team_length/number_pokemon
+		
+		if(allocated_pokemon_length.is_integer()):
+			if(allocated_pokemon_length != pokemon_length):
+				print("Correcting length from", pokemon_length, "to", allocated_pokemon_length)
+				pokemon_length = int(allocated_pokemon_length)
+		else:
+			print("Does not work")
+		
 		#iterate over that trainer's Pokemon
 		while True:
+			
 			if(t_pokemon_pointer != pokemon_pointer):
 				print("calculated value is ", t_pokemon_pointer - pokemon_pointer, "less than t_pokemon_pointer")
 				pokemon_pointer = t_pokemon_pointer
@@ -57,7 +73,55 @@ def calc_iii(em):
 			if(level <= 4 or level >= 79):
 				print("Found level of", level, "at", pokemon_pointer)
 				print(trainer_number)
-			else:
+				
+				#Some trainers seem to have allocated space different than expected. If this is the case for the last Pokemon of a trainer, it does not matter, it will be caught by the pointer of the next trainer
+				if(pokemon_length == 14):
+					#Check the position if length should have been 16
+					level = em[pokemon_pointer + 2 + 2]
+					if(level > 4 or level < 79):
+						print("Found a 16 that was encoded as 14")
+						pokemon_pointer += 2
+					#check if length 8 works
+					else:
+						level = em[pokemon_pointer + 2 - 6]
+						if(level > 4 or level < 79):
+							print("Found an 8 that was encoded as 14")
+							pokemon_pointer -= 6
+							
+				#check for encoded-as-16 that is incorrect
+				elif(pokemon_length == 16):
+					#check if 14 works
+					level = em[pokemon_pointer + 2 - 2]
+					if(level > 4 or level < 79):
+						print("Found a 14 that was encoded as 16")
+						pokemon_pointer -= 2
+					
+					#otherwise check if 8 works
+					else:
+						level = em[pokemon_pointer + 2 - 8]
+						if(level > 4 or level < 79):
+							print("Found an 8 that was encoded as 16")
+							pokemon_pointer -= 8
+							
+				#check for encoded-as-8 that is incorrect
+				else:
+					#check if 14 works (check this first, in this case, if 14 is also wrong it will be the low EV value, which is rarely if ever in the level range, while if 16 is wrong it will be the low index value, which is often in the level range
+					level = em[pokemon_pointer + 2 + 6]
+					if(level > 4 or level < 79):
+						print("Found a 14 that was encoded as 8")
+						pokemon_pointer += 6
+					
+					#otherwise check if 16 works
+					else:
+						level = em[pokemon_pointer + 2 + 8]
+						if(level > 4 or level < 79):
+							print("Found a 16 that was encoded as 8")
+							pokemon_pointer += 8
+					
+						
+					
+						
+			if(level > 4 or level < 79):
 				level = min(round(level * (1 + level/50)),100)
 				#write new level
 				em[pokemon_pointer + 2] = level
