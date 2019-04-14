@@ -69,8 +69,8 @@ def calc_iii(em):
 			level = em[pokemon_pointer + 2]
 			#use level * (1 + level/50) = (level + (level^2/50)) = (50 * level + level ^2)/50. Level 10 has (500 + 100)/50 = 600/50 = 60/5 = 12, level 20 has 20*1.4 = 28, level 30 has 30*1.6 = 48, level 40 has 40*1.8 = 72, 50*2 = 100
 			
-			#final check for incorrect values
-			if(level <= 4 or level >= 79):
+			#final check for incorrect values. either level that is too high or too low, or the after-level spot is not 0. The only thing the latter seems to have been causing was turning Roselias into Spheals and Dusclops into Glalies.
+			if(level <= 4 or level >= 79 or em[pokemon_pointer + 2 + 1] != 0):
 				print("Found level of", level, "at", pokemon_pointer)
 				print(trainer_number)
 				
