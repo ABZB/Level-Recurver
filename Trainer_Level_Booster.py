@@ -1,7 +1,6 @@
 from gen_iii_booster import *
 from gen_iv_booster import *
 
-
 #takes in bytearray, saves bytes to file
 def save_binary_file(data, file_name, path):
 	
@@ -11,9 +10,20 @@ def save_binary_file(data, file_name, path):
 	
 	with open(output_path, 'wb') as f:
 		f.write(output_binary)
-	
-def main(gen_number):
 
+
+#warns user if no options were chosen
+def nothing_selected():
+	Msgbox = tk.messagebox.askquestion('Nothing Selected', 'No options were selected, returning to Main Menu', icon = 'warning')
+		
+
+def main(gen_number, double_bool, scale_bool):
+	
+	#return to main menu if no options were selected
+	if(not(double_bool or scale_bool)):
+		nothing_selected()
+		return(False)
+	
 	try:
 		gen_number = int(gen_number)
 	except:
@@ -26,15 +36,18 @@ def main(gen_number):
 	if(gen_number == 3.2):
 		em, output_path = get_files_gen_iii()
 		
-		em = calc_iii(em)
+		em = calc_iii(em, double_bool, scale_bool)
 		file_name = "Emerald Scaled.gba"
 		
 		save_binary_file(em, file_name, output_path)
 
 	#Gen IV
-	elif(gen_number == 4.1):
+	elif(gen_number == 4.1 or gen_number == 4.2):
+		
+		
+	
 		#get the data files and the output path
-		trdata, trpoke, output_path = get_files_gen_iv(4.1)
+		trdata, trpoke, output_path = get_files_gen_iv(gen_number)
 	
 		trpoke = calc_iv(trdata, trpoke)
 	
@@ -44,9 +57,9 @@ def main(gen_number):
 	
 		save_binary_file(trpoke, file_name, output_path)
 		
-	elif(gen_number == 4.2):
+	elif():
 		#get the data files and the output path
-		trdata, output_path = get_files_gen_iv(4.2)
+		trdata, output_path = get_files_gen_iv(gen_number)
 		
 		print('working 1')
 	
@@ -61,23 +74,36 @@ def main(gen_number):
 		
 
 def main_menu():
-	global root_main_menu
-	root_main_menu = Tk()
+	global master
+	master = Tk()
 
-	frame_main_menu = Frame(root_main_menu)
-	frame_main_menu.pack()
-		
-	root_main_menu.title('Select Game to modify')
+	#frame_main_menu = Frame(master)
+	#frame_main_menu.pack()
+	master.title('Select Game to modify & modifications to apply')
 	
-	Button(frame_main_menu, text = 'Emerald', command = lambda: main('3.2'), height = 2, width = 50, pady = 1).pack()
+	#Mods to apply
 	
-	Button(frame_main_menu, text = 'Heart Gold/Soul Silver', command = lambda: main('4.1'), height = 2, width = 50, pady = 1).pack()
+	#booleans variables for checkboxes
+	double_bool = BooleanVar()
+	scale_bool = BooleanVar()
 	
-	Button(frame_main_menu, text = 'Platinum (doublify only)', command = lambda: main('4.2'), height = 2, width = 50, pady = 1).pack()
+	#checkboxes and accompanying text
+	Label(master, text = 'Options', font = (16)).grid(row = 0)
+	Checkbutton(master, text = 'Make Gym Leaders, E4 members, etc. Double Battles?', variable = double_bool, onvalue = True, offvalue = False).grid(row = 1, sticky = W)
 	
-	Button(frame_main_menu, text="Exit", command = root_main_menu.destroy, height = 2, width = 25, pady = 1).pack()
+	Checkbutton(master, text = 'Rescale Level Curve', variable = scale_bool, onvalue = True, offvalue = False).grid(row = 2, sticky = W)
 	
-	root_main_menu.mainloop()
+	#game selection
+	Label(master, text = 'Select Game', font = (16)).grid(row = 3, pady = 4)
+	Button(master, text = 'Emerald', command = lambda: main('3.2', double_bool, scale_bool), height = 2, width = 50, pady = 1).grid(row = 4)
+	
+	Button(master, text = 'Heart Gold/Soul Silver', command = lambda: main('4.1', double_bool, scale_bool), height = 2, width = 50, pady = 1).grid(row = 5)
+	
+	Button(master, text = 'Platinum', command = lambda: main('4.2', double_bool, scale_bool), height = 2, width = 50, pady = 1).grid(row = 6)
+	
+	Button(master, text="Exit", command = master.destroy, height = 2, width = 25, pady = 1).grid(row = 7)
+	
+	master.mainloop()
 	
 		
 main_menu()
