@@ -32,9 +32,9 @@ def main(gen_number):
 		save_binary_file(em, file_name, output_path)
 
 	#Gen IV
-	if(gen_number == 4.1):
+	elif(gen_number == 4.1):
 		#get the data files and the output path
-		trdata, trpoke, output_path = get_files_gen_iv()
+		trdata, trpoke, output_path = get_files_gen_iv(4.1)
 	
 		trpoke = calc_iv(trdata, trpoke)
 	
@@ -43,6 +43,22 @@ def main(gen_number):
 		output_path = output_path[:-1]
 	
 		save_binary_file(trpoke, file_name, output_path)
+		
+	elif(gen_number == 4.2):
+		#get the data files and the output path
+		trdata, output_path = get_files_gen_iv(4.2)
+		
+		print('working 1')
+	
+		#trpoke = calc_iv(trdata, trpoke)
+		
+		print(len(trdata))
+		trdata = doublify(trdata)
+	
+		#seperates the file name (always a single character from HGSS on) from path
+	
+		save_binary_file(trdata, 'trdata.narc', output_path)
+		
 
 def main_menu():
 	global root_main_menu
@@ -56,6 +72,8 @@ def main_menu():
 	Button(frame_main_menu, text = 'Emerald', command = lambda: main('3.2'), height = 2, width = 50, pady = 1).pack()
 	
 	Button(frame_main_menu, text = 'Heart Gold/Soul Silver', command = lambda: main('4.1'), height = 2, width = 50, pady = 1).pack()
+	
+	Button(frame_main_menu, text = 'Platinum (doublify only)', command = lambda: main('4.2'), height = 2, width = 50, pady = 1).pack()
 	
 	Button(frame_main_menu, text="Exit", command = root_main_menu.destroy, height = 2, width = 25, pady = 1).pack()
 	

@@ -210,32 +210,72 @@ def calc_iv(trdata, trpoke):
 			#increment the pokemon count
 			pokemon_count += 1
 	return(trpoke)
+
+def doublify(trdata):
 	
-def get_files_gen_iv():
+	#current integer byte-offset for TRdata
+	#TRdata, start from 0x2198 = 8600
+	pointer_data = 8600
+	trainer_number = 1
+	
+	
+	#parse trdata
+	while True:
+		
+		#get # of Pokemon, which is the 3rd hex pair on
+		number_pokemon = trdata[pointer_data + 3]
+		cls = trdata[pointer_data + 1]
+		
+		
+		#if the trainer has more than 2 Pokemon
+		if(number_pokemon >= 2):
+			#If the trainer is one of the ones that won't crash the game if doublified (those that definitely will not see and walk to the player)
+			if(cls == 0 or cls == 1 or (cls >= 62 and cls <= 69) or cls == 72 or (cls >= 74 and cls <= 79) or (cls >= 86 and cls <= 88) or cls >= 90):
+				#flag for double battle in platinum is at offset 0x10 with value 0x02
+				if(trdata[pointer_data + 16] & 2 != 2):
+					trdata[pointer_data + 16] = 2
+					print('Trainer number', trainer_number, 'doublified')
+		if(trainer_number >= 1065):
+			break
+		else:
+			pointer_data += 20
+			trainer_number += 1
+	return(trdata)
+
+def get_files_gen_iv(gen_number):
 
 	#for HGSS, trdata is a055, trpoke is a056
 	
 	#get hex file locations:
 	root = Tk()
 	root.update()
-	trdata_location = askopenfilename(filetypes = (("Select a/0/5/5", "*.*"), ("All Files", "*.*")))
-	trpoke_location = askopenfilename(filetypes = (("Select a/0/5/6", "*.*"), ("All Files", "*.*")))
+	if(gen_number == 4.1):
+		trdata_location = askopenfilename(filetypes = (("Select a/0/5/5", "*.*"), ("All Files", "*.*")))
+		trpoke_location = askopenfilename(filetypes = (("Select a/0/5/6", "*.*"), ("All Files", "*.*")))
+	else:
+		trdata_location = askopenfilename(filetypes = (("Select root/poketool/trainer/trdata", "*.*"), ("All Files", "*.*")))
+		
 	root.destroy()
 	
+	if(gen_number == 4.1):
+		trpoke = bytearray()
+
+		with open(trpoke_location, 'rb') as f:
+			trpoke_bin = f.read()
+
+		trpoke = bytearray(trpoke_bin)
+		
 	
 	trdata = bytearray()
-	trpoke = bytearray()
 	
 	#get the data
 	with open(trdata_location, 'rb') as f:
 		trdata_bin = f.read()
 	
-	with open(trpoke_location, 'rb') as f:
-		trpoke_bin = f.read()
-
-	
 	#convert the binary data into bytearrays. each index is one hex-pair
 	trdata = bytearray(trdata_bin)
-	trpoke = bytearray(trpoke_bin)
 	
-	return(trdata, trpoke, trpoke_location)
+	if(gen_number == 4.1):
+		return(trdata, trpoke, trpoke_location)
+	else:
+		return(trdata, trdata_location)
