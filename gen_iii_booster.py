@@ -7,7 +7,7 @@ evolve_level_barrier_array_iii = [0,16,32,0,16,36,0,16,36,0,7,10,0,7,10,0,18,36,
 doubles_set = {261,262,263,264,265,266,267,268,269,270,271,272,335,770,771,772,773,774,775,776,777,778,779,780,781,782,783,784,785,786,787,788,789,790,791,792,793,794,795,796,797,798,799,800,801}
 
 
-def calc_iii(em):
+def calc_iii(em, double_bool, scale_bool):
 	
 	#current integer byte-offset for TRdata
 	#TRdata, start from 0x310058 = 3211352
@@ -20,149 +20,150 @@ def calc_iii(em):
 	while True:
 		#get the number of Pokemon the trainer has
 		number_pokemon = em[trainer_pointer + 32]
-		
-		#Do the Pokemon have hold items? Custom moves?
-		extra_type = em[trainer_pointer]
-		
-		#none or custom hold items but not moves
-		if(extra_type == 0 or extra_type == 2):
-			pokemon_length = 8
-		#custom moves but no items
-		elif(extra_type == 1):
-			pokemon_length = 14
-		elif(extra_type == 3):
-		#hold items and custom moves
-			pokemon_length = 16
-		else:
-			print("Trainer data error - incorrect value or incorrect pointer")
-		
+	
 		#If a trainer has 3 or more pokemon, or is a Gym Leader or E4 member, make it a double battle
-		
-		if(number_pokemon >= 3 or trainer_number in doubles_set):
+		if(double_bool and (number_pokemon >= 3 or trainer_number in doubles_set)):
 			#don't modify if already set to double battle
 			if(em[trainer_pointer + 24]%2 != 1):
 				em[trainer_pointer + 24] += 1
 		
-		
-		#get the pointer to the trainer's first Pokemon (to check against iterated value)
-		t_pokemon_pointer = em[trainer_pointer + 36] + 256*em[trainer_pointer + 37] + 65536*em[trainer_pointer + 38]
-		
-		next_trainer_pointer = em[trainer_pointer + 36 + 40] + 256*em[trainer_pointer + 37 + 40] + 65536*em[trainer_pointer + 38 + 40]
-		
-		allocated_team_length = next_trainer_pointer - t_pokemon_pointer
-		
-		allocated_pokemon_length = allocated_team_length/number_pokemon
-		
-		if(allocated_pokemon_length.is_integer()):
-			if(allocated_pokemon_length != pokemon_length):
-				print("Correcting length from", pokemon_length, "to", allocated_pokemon_length)
-				pokemon_length = int(allocated_pokemon_length)
-		else:
-			print("Does not work")
-		
-		#iterate over that trainer's Pokemon
-		while True:
+		if(scale_bool):
+			#Do the Pokemon have hold items? Custom moves?
+			extra_type = em[trainer_pointer]
 			
-			if(t_pokemon_pointer != pokemon_pointer):
-				print("calculated value is ", t_pokemon_pointer - pokemon_pointer, "less than t_pokemon_pointer")
-				pokemon_pointer = t_pokemon_pointer
-			
-			#get level
-			level = em[pokemon_pointer + 2]
-			#use level * (1 + level/50) = (level + (level^2/50)) = (50 * level + level ^2)/50. Level 10 has (500 + 100)/50 = 600/50 = 60/5 = 12, level 20 has 20*1.4 = 28, level 30 has 30*1.6 = 48, level 40 has 40*1.8 = 72, 50*2 = 100
-			
-			#final check for incorrect values. either level that is too high or too low, or the after-level spot is not 0. The only thing the latter seems to have been causing was turning Roselias into Spheals and Dusclops into Glalies.
-			if(level <= 4 or level >= 79 or em[pokemon_pointer + 2 + 1] != 0):
-				print("Found level of", level, "at", pokemon_pointer)
-				print(trainer_number)
-				
-				#Some trainers seem to have allocated space different than expected. If this is the case for the last Pokemon of a trainer, it does not matter, it will be caught by the pointer of the next trainer
-				if(pokemon_length == 14):
-					#Check the position if length should have been 16
-					level = em[pokemon_pointer + 2 + 2]
-					if((level > 4 or level < 79) and em[pokemon_pointer + 2 + 2 + 1] == 0):
-						print("Found a 16 that was encoded as 14")
-						pokemon_pointer += 2
-					#check if length 8 works
-					else:
-						level = em[pokemon_pointer + 2 - 6]
-						if((level > 4 or level < 79) and em[pokemon_pointer + 2 - 6 + 1] == 0):
-							print("Found an 8 that was encoded as 14")
-							pokemon_pointer -= 6
-							
-				#check for encoded-as-16 that is incorrect
-				elif(pokemon_length == 16):
-					#check if 14 works
-					level = em[pokemon_pointer + 2 - 2]
-					if((level > 4 or level < 79) and em[pokemon_pointer + 2 - 2 + 1] == 0):
-						print("Found a 14 that was encoded as 16")
-						pokemon_pointer -= 2
-					
-					#otherwise check if 8 works
-					else:
-						level = em[pokemon_pointer + 2 - 8]
-						if((level > 4 or level < 79) and em[pokemon_pointer + 2 - 8 + 1] == 0):
-							print("Found an 8 that was encoded as 16")
-							pokemon_pointer -= 8
-							
-				#check for encoded-as-8 that is incorrect
-				else:
-					#check if 14 works (check this first, in this case, if 14 is also wrong it will be the low EV value, which is rarely if ever in the level range, while if 16 is wrong it will be the low index value, which is often in the level range
-					level = em[pokemon_pointer + 2 + 6]
-					if((level > 4 or level < 79) and em[pokemon_pointer + 2 + 6 + 1] == 0):
-						print("Found a 14 that was encoded as 8")
-						pokemon_pointer += 6
-					
-					#otherwise check if 16 works
-					else:
-						level = em[pokemon_pointer + 2 + 8]
-						if((level > 4 or level < 79) and em[pokemon_pointer + 2 + 8 + 1] == 0):
-							print("Found a 16 that was encoded as 8")
-							pokemon_pointer += 8
-					
-						
-					
-						
-			if(level > 4 or level < 79):
-				level = min(round(level * (1 + level/50)),100)
-				#write new level
-				em[pokemon_pointer + 2] = level
-			
-			
-				#If the Pokemon should be evolved, evolve it. Will evolve any unevolved Pokemon that is 5 or more levels above the minimum level
-				low_digits = em[pokemon_pointer + 4]
-				high_digits = em[pokemon_pointer + 5]
-				
-				index = low_digits + 256*high_digits
-				
-				#last Pokemon that can evolve by internal index number in gen III is Metang, at 399
-				if(index < 400):
-					#If the Pokemon is past the level it evolves at by level-up
-					if(level >= evolve_level_barrier_array_iii[index]):
-						new_index = evolve_array_iii[index]
-						if(new_index != index):
-							
-							#convert back to hex pairs
-							low_digits = new_index%256
-							high_digits = int((new_index - low_digits)/256)
-							
-							#write
-							em[pokemon_pointer + 4] = low_digits
-							em[pokemon_pointer + 5] = high_digits
-			
-			
+			#none or custom hold items but not moves
+			if(extra_type == 0 or extra_type == 2):
+				pokemon_length = 8
+			#custom moves but no items
+			elif(extra_type == 1):
+				pokemon_length = 14
+			elif(extra_type == 3):
+			#hold items and custom moves
+				pokemon_length = 16
 			else:
-				print("No modification")
-			#move pointer to next Pokemon
-			pokemon_pointer += pokemon_length
-			t_pokemon_pointer += pokemon_length
+				print("Trainer data error - incorrect value or incorrect pointer")
 			
-			#decrement party count of current trainer
-			number_pokemon -= 1
 			
-			#checks if finished with current trainer, if so, break. If not, everything is set up for next iteration
-			if(number_pokemon == 0):
-				break
+			
+			#get the pointer to the trainer's first Pokemon (to check against iterated value)
+			t_pokemon_pointer = em[trainer_pointer + 36] + 256*em[trainer_pointer + 37] + 65536*em[trainer_pointer + 38]
+			
+			next_trainer_pointer = em[trainer_pointer + 36 + 40] + 256*em[trainer_pointer + 37 + 40] + 65536*em[trainer_pointer + 38 + 40]
+			
+			allocated_team_length = next_trainer_pointer - t_pokemon_pointer
+			
+			allocated_pokemon_length = allocated_team_length/number_pokemon
+			
+			if(allocated_pokemon_length.is_integer()):
+				if(allocated_pokemon_length != pokemon_length):
+					print("Correcting length from", pokemon_length, "to", allocated_pokemon_length)
+					pokemon_length = int(allocated_pokemon_length)
+			else:
+				print("Does not work")
+			
+			#iterate over that trainer's Pokemon
+			while True:
+				
+				if(t_pokemon_pointer != pokemon_pointer):
+					print("calculated value is ", t_pokemon_pointer - pokemon_pointer, "less than t_pokemon_pointer")
+					pokemon_pointer = t_pokemon_pointer
+				
+				#get level
+				level = em[pokemon_pointer + 2]
+				#use level * (1 + level/50) = (level + (level^2/50)) = (50 * level + level ^2)/50. Level 10 has (500 + 100)/50 = 600/50 = 60/5 = 12, level 20 has 20*1.4 = 28, level 30 has 30*1.6 = 48, level 40 has 40*1.8 = 72, 50*2 = 100
+				
+				#final check for incorrect values. either level that is too high or too low, or the after-level spot is not 0. The only thing the latter seems to have been causing was turning Roselias into Spheals and Dusclops into Glalies.
+				if(level <= 4 or level >= 79 or em[pokemon_pointer + 2 + 1] != 0):
+					print("Found level of", level, "at", pokemon_pointer)
+					print(trainer_number)
+					
+					#Some trainers seem to have allocated space different than expected. If this is the case for the last Pokemon of a trainer, it does not matter, it will be caught by the pointer of the next trainer
+					if(pokemon_length == 14):
+						#Check the position if length should have been 16
+						level = em[pokemon_pointer + 2 + 2]
+						if((level > 4 or level < 79) and em[pokemon_pointer + 2 + 2 + 1] == 0):
+							print("Found a 16 that was encoded as 14")
+							pokemon_pointer += 2
+						#check if length 8 works
+						else:
+							level = em[pokemon_pointer + 2 - 6]
+							if((level > 4 or level < 79) and em[pokemon_pointer + 2 - 6 + 1] == 0):
+								print("Found an 8 that was encoded as 14")
+								pokemon_pointer -= 6
+								
+					#check for encoded-as-16 that is incorrect
+					elif(pokemon_length == 16):
+						#check if 14 works
+						level = em[pokemon_pointer + 2 - 2]
+						if((level > 4 or level < 79) and em[pokemon_pointer + 2 - 2 + 1] == 0):
+							print("Found a 14 that was encoded as 16")
+							pokemon_pointer -= 2
+						
+						#otherwise check if 8 works
+						else:
+							level = em[pokemon_pointer + 2 - 8]
+							if((level > 4 or level < 79) and em[pokemon_pointer + 2 - 8 + 1] == 0):
+								print("Found an 8 that was encoded as 16")
+								pokemon_pointer -= 8
+								
+					#check for encoded-as-8 that is incorrect
+					else:
+						#check if 14 works (check this first, in this case, if 14 is also wrong it will be the low EV value, which is rarely if ever in the level range, while if 16 is wrong it will be the low index value, which is often in the level range
+						level = em[pokemon_pointer + 2 + 6]
+						if((level > 4 or level < 79) and em[pokemon_pointer + 2 + 6 + 1] == 0):
+							print("Found a 14 that was encoded as 8")
+							pokemon_pointer += 6
+						
+						#otherwise check if 16 works
+						else:
+							level = em[pokemon_pointer + 2 + 8]
+							if((level > 4 or level < 79) and em[pokemon_pointer + 2 + 8 + 1] == 0):
+								print("Found a 16 that was encoded as 8")
+								pokemon_pointer += 8
+						
+							
+						
+							
+				if(level > 4 or level < 79):
+					level = min(round(level * (1 + level/50)),100)
+					#write new level
+					em[pokemon_pointer + 2] = level
+				
+				
+					#If the Pokemon should be evolved, evolve it. Will evolve any unevolved Pokemon that is 5 or more levels above the minimum level
+					low_digits = em[pokemon_pointer + 4]
+					high_digits = em[pokemon_pointer + 5]
+					
+					index = low_digits + 256*high_digits
+					
+					#last Pokemon that can evolve by internal index number in gen III is Metang, at 399
+					if(index < 400):
+						#If the Pokemon is past the level it evolves at by level-up
+						if(level >= evolve_level_barrier_array_iii[index]):
+							new_index = evolve_array_iii[index]
+							if(new_index != index):
+								
+								#convert back to hex pairs
+								low_digits = new_index%256
+								high_digits = int((new_index - low_digits)/256)
+								
+								#write
+								em[pokemon_pointer + 4] = low_digits
+								em[pokemon_pointer + 5] = high_digits
+				
+				
+				else:
+					print("No modification")
+				#move pointer to next Pokemon
+				pokemon_pointer += pokemon_length
+				t_pokemon_pointer += pokemon_length
+				
+				#decrement party count of current trainer
+				number_pokemon -= 1
+				
+				#checks if finished with current trainer, if so, break. If not, everything is set up for next iteration
+				if(number_pokemon == 0):
+					break
 			
 		
 		trainer_pointer += 40 #0x28
