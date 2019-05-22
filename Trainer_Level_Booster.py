@@ -34,8 +34,8 @@ def main(gen_number, double_bool, double_all_bool, mix_it_up_bool, scale_bool):
 			print("Problem with Gen number:", gen_number, type(gen_number))
 	
 	#errors
-	if(double_all_bool and gen_number == 4.1 or gen_number == 4.2):
-		print("Does not work in Gen IV (Causes freezing)")
+	if(double_all_bool and (gen_number == 4.1 or gen_number == 4.2 or gen_number == 5.1)):
+		print("Does not work in Gen IV or Gen V (Causes freezing)")
 		return(False)
 		
 	if(double_all_bool and mix_it_up_bool):
@@ -132,7 +132,7 @@ def main_menu():
 	
 	row_iter += 1
 	
-	Checkbutton(master, text = 'Make as many battles as possible double battles (Gen III and V only)', variable = double_all_bool, onvalue = True, offvalue = False).grid(row = row_iter, sticky = W)
+	Checkbutton(master, text = 'Make as many battles as possible double battles (Gen III only)', variable = double_all_bool, onvalue = True, offvalue = False).grid(row = row_iter, sticky = W)
 	
 	row_iter += 1
 	

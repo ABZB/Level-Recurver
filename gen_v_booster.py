@@ -56,13 +56,24 @@ def calc_v(trdata, trpoke, double_bool, double_all_bool, mix_it_up_bool, scale_b
 		if(mix_it_up_bool and number_pokemon >= 2):
 			#check if already set to a special battle type
 			if(trdata[pointer_data + 2] & 3 == 0):
-				#if only two Pokemon, just set to Double:
-				if(number_pokemon == 2):
+				#if only two Pokemon and won't freeze, just set to Double:
+				if(number_pokemon == 2 and trdata[pointer_data+1] in doubles_set):
 					trdata[pointer_data + 2] += 1
-				#otherwise, randomly assign one of the special battle types
-				else:
-					trdata[pointer_data + 2] += random.randint(1,3)
-			
+				#otherwise, randomly assign one of the battle types other than double
+				elif(number_pokemon > 2):
+					temp = random.randint(1,3)
+					#if the outcome is not Double, set battle type to that
+					if(temp != 1):
+						trdata[pointer_data + 2] += temp
+					#if the selection is double, if it won't crash the game, set it to double
+					elif(trdata[pointer_data+1] in doubles_set):
+						trdata[pointer_data + 2] += temp
+					#otherwise, leave the battle as a single battle
+						
+		#set AI to proper value (highest bit set to 1) for double/triple values (it prevents them from attacking their own Pokemon)
+		if(trdata[pointer_data + 2] == 1 or trdata[pointer_data + 2] == 2):
+			if(trdata[pointer_data + 12] & 128 == 0):
+				trdata[pointer_data + 12] += 128
 		
 		#write as many skips as the trainer has Pokemon
 		pokemon_count = 0
