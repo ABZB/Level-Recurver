@@ -40,9 +40,9 @@ Section III: Options:
 
 	* Make Gym Leaders, E4 members, etc. Double Battles - All major story battles become double battles. This is the only battle-style changing option for Gen IV, as the game will crash if a singleton trainer sees the player and tries to step forward to initiate a double battle.
 	
-	* Make as many battles as possible double battles - All trainers with at least 2 Pokemon will now initiate Double Battles.
+	* Make as many battles as possible double battles - All trainers with at least 2 Pokemon will now initiate Double Battles. This is only available for Emerald.
 	
-	* Make as many battles as possible Double, Triple, or Rotation battles - All trainers with exactly 2 Pokemon become Double Battles. All trainers with at least 3 Pokemon are randomly assigned one of Double, Triple, or Rotation (this is done when the editing is made, every time this is run will generate a different spread). If you also select "Make Gym Leaders, E4 members, etc. Double Battles", those will all be Double Battles, they will not be randomized.
+	* Make as many battles as possible Double, Triple, or Rotation battles - All trainers with non-stationary trainer classes (such as Gym Leaders) and at least 3 Pokemon are randomly assigned one of Triple or Rotation battles (this is done when the program is run, every time it is run it will generate a different spread). Stationary trainer classes with at least three Pokemon are randomly assigned one of Double, Triple, or Rotation battles. Stationary trainer classes with exactly two Pokemon are assigned Double battles. All other trainers (including those that are already not single battles) are unchanged.
 
 Section IV: Instructions
 
