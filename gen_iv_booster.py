@@ -8,19 +8,44 @@ evolve_array_hgss = [0,2,3,3,5,6,6,8,9,9,11,12,12,14,15,15,17,18,18,20,20,22,22,
 evolve_level_barrier_array_hgss = [0,16,32,0,16,36,0,16,36,0,7,10,0,7,10,0,18,36,0,20,0,20,0,22,0,0,0,22,0,16,21,0,16,21,0,5,0,5,0,5,0,22,27,21,26,0,24,0,31,0,26,0,28,0,33,0,28,0,5,0,25,30,0,16,21,0,28,33,0,21,26,0,30,0,25,30,0,40,0,37,0,30,35,0,31,0,34,0,38,0,5,0,25,30,0,5,26,0,28,0,30,0,5,0,28,0,0,0,5,35,0,42,47,52,57,0,32,37,33,0,5,0,0,0,0,5,10,0,0,20,0,0,0,0,0,0,0,30,40,0,40,0,0,0,0,0,0,30,55,0,0,0,16,32,0,14,36,0,18,30,0,15,0,20,0,18,0,22,0,0,27,0,10,10,10,10,30,25,0,15,30,0,0,18,0,0,0,18,27,0,40,5,0,5,40,0,0,0,40,0,40,0,0,0,31,0,0,40,0,23,0,0,0,0,0,30,30,0,38,0,33,38,0,25,0,0,0,0,24,0,0,25,0,40,0,0,20,0,30,30,30,0,0,0,0,0,30,55,0,0,0,0,16,36,0,16,36,0,16,36,0,18,0,20,0,7,10,0,10,0,14,19,0,14,19,0,22,0,25,0,20,30,0,22,0,23,0,18,36,0,20,0,0,20,40,0,24,0,15,30,20,0,0,0,32,42,0,37,0,26,0,0,0,0,0,36,26,0,30,0,40,0,33,0,0,32,0,0,35,45,0,32,0,35,0,0,0,0,0,30,0,30,0,36,0,40,0,40,0,5,0,0,0,37,0,37,42,0,0,0,15,42,0,32,44,0,5,0,0,0,0,30,50,0,20,45,0,0,0,0,0,0,0,0,0,0,0,18,32,0,14,36,0,16,36,0,14,34,0,15,0,10,0,15,30,0,10,0,30,0,30,0,20,0,0,21,0,0,26,0,25,0,30,0,0,28,0,5,0,0,0,38,0,10,34,0,33,0,10,10,10,0,0,24,48,0,30,35,0,34,0,40,0,37,0,0,31,0,30,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 
-def calc_iv(trdata, trpoke):
+def calc_iv(trdata, trpoke, double_bool, scale_bool):
 	
 	trainer_array = []
 	pokemon_array = []
 	
-	#current integer byte-offset for TRdata
-	#TRdata, start from 0x1758 = 5976
-	pointer_data = 5976
+	pointer_data = 0
+	pointer_poke = 0
+
+	max_level_array = [50,1]
+		
+	#Renegade Platinum
+	#0X2198 = 8600
+	
+	#Search for 47 4D 49 46, which always precedes a series of 00 prior to first trainer.
+	
+	for i in range(len(trdata)):
+		if(trdata[i] == 71 and trdata[i + 1] == 77 and trdata[i + 2] == 73 and trdata[i + 3 ] == 70):
+			pointer_data = i + 28
+	
+	if(pointer_data == 0):
+		#HGSS
+		if(gen_number == 4.2):
+			#current integer byte-offset for TRdata
+			#TRdata, start from 0x1758 = 5976
+			pointer_data = 5976
+		
+		#Platinum
+		if(gen_number == 4.1):
+			#current integer byte-offset for TRdata
+			#TRdata, start from 0x1D48 = 7496
+			pointer_data = 7496
+			
+	#get number of trainers
+	max_trainer = (len(trdata) - pointer_data + 1)/20
+		
 	trainer_number = 0
 	#will have bump at the trainer number location
 	trainer_bump = []
-	
-	
 	#parse trdata
 	while True:
 		skip_number = 8
@@ -42,10 +67,6 @@ def calc_iv(trdata, trpoke):
 		#write as many skips as the trainer has Pokemon
 		pokemon_count = 0
 		while True:
-			#fix for Bugsy (third Pokemon has an extra byte for some reason)
-			#if((trainer_number == 20 and pokemon_count == 2) or (trainer_number == 31 and pokemon_count == 2) or (trainer_number == 32 and pokemon_count == 2) or (trainer_number == 159 and pokemon_count == 0) or (trainer_number == 160 and pokemon_count == 0)):
-				#skip_number += 2
-				#print("fix")
 			trainer_array.append([trainer_number, skip_number])
 			pokemon_count += 1
 			if(pokemon_count == number_pokemon):
@@ -53,217 +74,247 @@ def calc_iv(trdata, trpoke):
 		
 		trainer_bump.append(0)
 		
+		if(double_bool and gen_number == 4.1):
+			if(number_pokemon >= 2):
+				#If the trainer is one of the ones that won't crash the game if doublified (those that definitely will not see and walk to the player)
+				if(cls == 0 or cls == 1 or (cls >= 62 and cls <= 69) or cls == 72 or (cls >= 74 and cls <= 79) or (cls >= 86 and cls <= 88) or cls >= 90):
+					#flag for double battle in platinum is at offset 0x10 with value 0x02
+					if(trdata[pointer_data + 16] & 2 != 2):
+						trdata[pointer_data + 16] = 2
+		
+		
 		trainer_number += 1
 		pointer_data += 20
 		
-		if(trainer_number == 737):
+		if(trainer_number == max_trainer):
 			break
-			
 	
-	#offset initial for trpoke = 174E = 5966
-	pointer_poke = 5966
-	pokemon_count = 0
-	total_pokemon = len(trainer_array)
+	if(scale_bool):
 	
-	edit_array = []
-	
-	#pull all the levels:
-	while True:
+		#same pre-flag as before, with different preceding offset
+		for i in range(len(trpoke)):
+			if(trpoke[i] == 71 and trpoke[i + 1] == 77 and trpoke[i + 2] == 73 and trpoke[i + 3 ] == 70):
+				pointer_poke = i + 18
 		
-		level = trpoke[pointer_poke]
+		if(pointer_poke == 0):
+			if(gen_number == 4.2):
+				#HGSS
+				#offset initial for trpoke = 174E = 5966
+				pointer_poke = 5966
+				
+				
+		pokemon_count = 0
+		total_pokemon = len(trainer_array)
+		edit_array = []
 		
-		if(level == 0 or level > 100):
-			level1 = trpoke[pointer_poke+2]
-			level2 = trpoke[pointer_poke-2]
-			print("trying", level1, level2)
+		#pull all the levels:
+		while True:
 			
-			if((level1 == 0 or level1 > 100) and (level2 == 0 or level2 > 100)):
-				print("cannot fix")
-				print("problem at trainer", 1+trainer_array[pokemon_count][0], "getting value", level, "at", pointer_poke)
-			#two ahead is good but two behind is not
-			elif((level1 > 0 and level1 <= 100) and (level2 == 0 or level2 > 100)):
-				print("two ahead good", level1, "replacing", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
-				level = level1
-				pointer_poke += 2
-			#two behind is good but two ahead is not
-			elif((level1 == 0 or level1 > 100) and (level2 > 0 and level2 <= 100)):
-				print("two behind good", level1, "replacing", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
-				level = level2
-				pointer_poke -= 2
-			#both good
+			level = trpoke[pointer_poke]
+			
+			if(level == 0 or level > 100):
+				level1 = trpoke[pointer_poke+2]
+				level2 = trpoke[pointer_poke-2]
+				print("trying", level1, level2)
+				
+				if((level1 == 0 or level1 > 100) and (level2 == 0 or level2 > 100)):
+					print("cannot fix")
+					print("problem at trainer", 1+trainer_array[pokemon_count][0], "getting value", level, "at", pointer_poke)
+				#two ahead is good but two behind is not
+				elif((level1 > 0 and level1 <= 100) and (level2 == 0 or level2 > 100)):
+					print("two ahead good", level1, "replacing", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
+					level = level1
+					pointer_poke += 2
+				#two behind is good but two ahead is not
+				elif((level1 == 0 or level1 > 100) and (level2 > 0 and level2 <= 100)):
+					print("two behind good", level2, "replacing", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
+					level = level2
+					pointer_poke -= 2
+				#both good
+				else:
+					print("Both make sense, check manually", level1, level2, "error value", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
+					level = min(level1, level2)
+			
+			#level at address pokemon_count
+			edit_array.append([level, pointer_poke])
+			
+			#keep track of highest and second highest levels, and their counts
+			if(level > max_level_array[0]/max_level_array[1]  and level < 95):
+				max_level_array[0] += level
+				max_level_array[1] += 1
+		
+			#if this is the last Pokemon, break
+			if(pokemon_count + 1 >= total_pokemon):
+				break
 			else:
-				print("Both make sense, check manually", level1, level2, "error value", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
-				level = min(level1, level2)
+				#move to the next pokemon
+				pointer_poke += trainer_array[pokemon_count][1]
+				#increment the pokemon count
+				pokemon_count += 1
 		
-		#level at address pokemon_count
-		edit_array.append([level, pointer_poke])
 		
-		
-		#if this is the last Pokemon, break
-		if(pokemon_count + 1 >= total_pokemon):
-			break
-		else:
-			#move to the next pokemon
-			pointer_poke += trainer_array[pokemon_count][1]
-			#increment the pokemon count
-			pokemon_count += 1
-	
-	
-	
-	#initial scaling of all Pokemon
-	pokemon_count = 0
-	while True:
-	
-		level = edit_array[pokemon_count][0]
-		
-		#scales level, taking into account the order in which that trainer is encountered in-game. 
-		try:
-		
-			mult = trainer_scale_array_hgss[trainer_array[pokemon_count][0]]
-			mult /= 100
-			mult += 1
-			new_level = round(mult*level)
+		if(gen_number == 4.1):
+			#calculate level curve
 			
-			if(new_level == level):
-				new_level += 1
+			#The level that will the first level certainly mapped to 100
+			level_to_100 = max_level_array[0]/max_level_array[1]
 			
-			#ensures that the level is at least the minimum level
+			#avoid divide by zero, in this case rescaling is minimal anyway
+			if(level_to_100 == 100):
+				level_to_100 = 99
+			
+			curve_exponent = 0.5
+			
+			curve_divisor = level_to_100**(1+curve_exponent)/(100 - level_to_100)
+			
+			print('Mapping', level_to_100, 'to 100.', 'Curve divisor is', curve_divisor)
+			
+			
+			pokemon_count = 0
 			while True:
-				if(new_level + trainer_bump[trainer_array[pokemon_count][0]] < trainer_min_level_array_hgss[trainer_array[pokemon_count][0]]):
-					trainer_bump[trainer_array[pokemon_count][0]] += 1
+			
+				level = edit_array[pokemon_count][0]
+				
+				#function adds to level L (L^(curve_exponent))/(curve_divisor)*100% of L
+				level = level*(1 + (level**curve_exponent)/curve_divisor)
+				level = min(round(level), 100)
+				trpoke[edit_array[pokemon_count][1]] = level
+				
+				#if this is the last Pokemon, break
+				if(pokemon_count + 1 >= total_pokemon):
+					break
+				else:
+					#increment the pokemon count
+					pokemon_count += 1
+		
+		if(gen_number == 4.2):
+			#initial scaling of all Pokemon
+			pokemon_count = 0
+			while True:
+			
+				level = edit_array[pokemon_count][0]
+				
+				#scales level, taking into account the order in which that trainer is encountered in-game. 
+				try:
+				
+					mult = trainer_scale_array_hgss[trainer_array[pokemon_count][0]]
+					mult /= 100
+					mult += 1
+					new_level = round(mult*level)
+					
+					if(new_level == level):
+						new_level += 1
+					
+					#ensures that the level is at least the minimum level
+					while True:
+						if(new_level + trainer_bump[trainer_array[pokemon_count][0]] < trainer_min_level_array_hgss[trainer_array[pokemon_count][0]]):
+							trainer_bump[trainer_array[pokemon_count][0]] += 1
+						else:
+							break
+					#print("Trainer number", trainer_array[pokemon_count][0], "Bumped by", trainer_bump[trainer_array[pokemon_count][0]])
+						
+					level = min(new_level, 100)
+					
+				except:
+					print("exception")
+					level = 100
+				
+				edit_array[pokemon_count][0] = level
+				
+				#if this is the last Pokemon, break
+				if(pokemon_count + 1 >= total_pokemon):
+					break
+				else:
+					#increment the pokemon count
+					pokemon_count += 1
+			
+			#add to each trainer to satisfy min level, evolve if needed, then write back to array
+			pokemon_count = 0
+			while True:
+			
+				pointer_poke = edit_array[pokemon_count][1]
+				level = min(edit_array[pokemon_count][0] + trainer_bump[trainer_array[pokemon_count][0]], 100)
+				
+				print(trainer_array[pokemon_count][0], trainer_bump[trainer_array[pokemon_count][0]], level)
+							
+
+				#write level back to the byte
+				trpoke[pointer_poke] = level
+				#if this is the last Pokemon, break
+				if(pokemon_count + 1 >= total_pokemon):
+					break
+				else:
+					#increment the pokemon count
+					pokemon_count += 1
+		
+		
+		pokemon_count = 0
+		while True:			
+			#evolve the Pokemon if it is above the level it evolves at (or set value for other kinds of evolutions)
+			
+			#get index number
+			low_digits = trpoke[pointer_poke + 2]
+			high_digits = trpoke[pointer_poke + 3]*256
+			
+			index_number = low_digits + high_digits
+			
+			new_number = index_number
+				
+			#get the level that Pokemon should be evolved above. recurse in case a non-evolved pokemon is high enough to evolve twice
+			while True:
+				#get the level this Pokemon should evolve by
+				try:
+					evolve_level = evolve_level_barrier_array_hgss[new_number]
+				except:
+					print("Error at", trainer_array[pokemon_count][0] + 1)
+					break
+					
+				#if it's high enough, grab the index number of the next stage
+				if(level >= evolve_level):
+					new_number = evolve_array_hgss[new_number]
 				else:
 					break
-			#print("Trainer number", trainer_array[pokemon_count][0], "Bumped by", trainer_bump[trainer_array[pokemon_count][0]])
-				
-			level = min(new_level, 100)
+				if(new_number == evolve_array_hgss[new_number]):
+					break
 			
-		except:
-			print("exception")
-			level = 100
-		
-		edit_array[pokemon_count][0] = level
-		
-		#if this is the last Pokemon, break
-		if(pokemon_count + 1 >= total_pokemon):
-			break
-		else:
-			#increment the pokemon count
-			pokemon_count += 1
-		
-		
-		
-	#add to each trainer to satisfy min level, evolve if needed, then write back to array
-	pokemon_count = 0
-	while True:
-	
-		pointer_poke = edit_array[pokemon_count][1]
-		level = min(edit_array[pokemon_count][0] + trainer_bump[trainer_array[pokemon_count][0]], 100)
-		
-		print(trainer_array[pokemon_count][0], trainer_bump[trainer_array[pokemon_count][0]], level)
-		
-		#evolve the Pokemon if it is above the level it evolves at (or set value for other kinds of evolutions)
-		
-		#get index number
-		low_digits = trpoke[pointer_poke + 2]
-		high_digits = trpoke[pointer_poke + 3]*256
-		
-		index_number = low_digits + high_digits
-		
-		new_number = index_number
-		
-		#get the level that Pokemon should be evolved above. recurse in case a non-evolved pokemon is high enough to evolve twice
-		while True:
-			#get the level this Pokemon should evolve by
-			try:
-				evolve_level = evolve_level_barrier_array_hgss[new_number]
-			except:
-				print("Error at", trainer_array[pokemon_count][0] + 1)
+			#write new index number if different
+			if(new_number != index_number):
+				# as max in gen IV is 507, this is either 0x00 or 0x01. Only need to write either 0 or 1 
+				if(new_number > 256):
+					trpoke[pointer_poke + 3] = 1
+					new_number -= 256
+				else:
+					#write 0 to the high digit
+					trpoke[pointer_poke + 3] = 0
+				#low digit
+				trpoke[pointer_poke + 2] = new_number
+			#if this is the last Pokemon, break
+			if(pokemon_count + 1 >= total_pokemon):
 				break
-				
-			#if it's high enough, grab the index number of the next stage
-			if(level >= evolve_level):
-				new_number = evolve_array_hgss[new_number]
 			else:
-				break
-			if(new_number == evolve_array_hgss[new_number]):
-				break
-		
-		#write new index number if different
-		if(new_number != index_number):
-			# as max in gen IV is 507, this is either 0x00 or 0x01. Only need to write either 0 or 1 
-			if(new_number > 256):
-				trpoke[pointer_poke + 3] = 1
-				new_number -= 256
-			else:
-				#write 0 to the high digit
-				trpoke[pointer_poke + 3] = 0
-			#low digit
-			trpoke[pointer_poke + 2] = new_number
-					
-
-		#write level back to the byte
-		trpoke[pointer_poke] = level
-		#if this is the last Pokemon, break
-		if(pokemon_count + 1 >= total_pokemon):
-			break
-		else:
-			#increment the pokemon count
-			pokemon_count += 1
-	return(trpoke)
-
-def doublify(trdata):
-	
-	#current integer byte-offset for TRdata
-	#TRdata, start from 0x2198 = 8600
-	pointer_data = 8600
-	trainer_number = 1
-	
-	
-	#parse trdata
-	while True:
-		
-		#get # of Pokemon, which is the 3rd hex pair on
-		number_pokemon = trdata[pointer_data + 3]
-		cls = trdata[pointer_data + 1]
-		
-		
-		#if the trainer has more than 2 Pokemon
-		if(number_pokemon >= 2):
-			#If the trainer is one of the ones that won't crash the game if doublified (those that definitely will not see and walk to the player)
-			if(cls == 0 or cls == 1 or (cls >= 62 and cls <= 69) or cls == 72 or (cls >= 74 and cls <= 79) or (cls >= 86 and cls <= 88) or cls >= 90):
-				#flag for double battle in platinum is at offset 0x10 with value 0x02
-				if(trdata[pointer_data + 16] & 2 != 2):
-					trdata[pointer_data + 16] = 2
-					print('Trainer number', trainer_number, 'doublified')
-		if(trainer_number >= 1065):
-			break
-		else:
-			pointer_data += 20
-			trainer_number += 1
-	return(trdata)
+				#increment the pokemon count
+				pokemon_count += 1
+	return(trpoke, trdata)
 
 def get_files_gen_iv(gen_number):
 
 	#for HGSS, trdata is a055, trpoke is a056
 	
 	#get hex file locations:
-	root = Tk()
-	root.update()
 	if(gen_number == 4.1):
 		trdata_location = askopenfilename(filetypes = (("Select a/0/5/5", "*.*"), ("All Files", "*.*")))
 		trpoke_location = askopenfilename(filetypes = (("Select a/0/5/6", "*.*"), ("All Files", "*.*")))
-	else:
+	elif(gen_number == 4.2):
 		trdata_location = askopenfilename(filetypes = (("Select root/poketool/trainer/trdata", "*.*"), ("All Files", "*.*")))
+		trdpoke_location = askopenfilename(filetypes = (("Select root/poketool/trainer/trpoke", "*.*"), ("All Files", "*.*")))
 		
-	root.destroy()
-	
-	if(gen_number == 4.1):
-		trpoke = bytearray()
 
-		with open(trpoke_location, 'rb') as f:
-			trpoke_bin = f.read()
+	trpoke = bytearray()
 
-		trpoke = bytearray(trpoke_bin)
+	with open(trpoke_location, 'rb') as f:
+		trpoke_bin = f.read()
+
+	trpoke = bytearray(trpoke_bin)
 		
 	
 	trdata = bytearray()
@@ -275,7 +326,5 @@ def get_files_gen_iv(gen_number):
 	#convert the binary data into bytearrays. each index is one hex-pair
 	trdata = bytearray(trdata_bin)
 	
-	if(gen_number == 4.1):
-		return(trdata, trpoke, trpoke_location)
-	else:
-		return(trdata, trdata_location)
+
+	return(trdata, trpoke, trpoke_location)
