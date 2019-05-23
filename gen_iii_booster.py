@@ -4,16 +4,34 @@ evolve_array_iii = [0,2,3,3,5,6,6,8,9,9,11,12,12,14,15,15,17,18,18,20,20,22,22,2
 evolve_level_barrier_array_iii = [0,16,32,0,16,36,0,16,36,0,7,10,0,7,10,0,18,36,0,20,0,20,0,22,0,100,0,22,0,16,21,0,16,21,0,5,0,50,0,5,0,22,27,21,26,0,24,0,31,0,26,0,28,0,33,0,28,0,5,0,25,30,0,16,21,0,28,33,0,21,26,0,30,0,25,30,0,40,0,37,0,30,35,0,31,0,34,0,38,0,5,0,25,30,0,5,26,0,28,0,30,0,5,0,28,0,0,0,5,35,0,42,47,52,57,0,32,37,33,0,5,0,0,0,0,5,10,0,0,20,0,0,0,0,0,0,0,30,40,0,40,0,0,0,0,0,0,30,55,0,0,0,16,32,0,14,36,0,18,30,0,15,0,20,0,18,0,22,0,0,27,0,10,10,10,10,30,25,0,15,30,0,0,18,0,0,0,18,27,0,40,5,0,5,40,0,0,0,40,0,40,0,0,0,31,0,0,40,0,23,0,0,0,0,0,30,30,0,38,0,33,38,0,25,0,0,0,0,24,0,0,25,0,40,0,0,20,0,30,30,30,0,0,0,0,0,30,55,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,36,0,16,36,0,16,36,0,18,0,20,0,7,10,0,10,0,14,19,0,14,19,0,20,0,0,22,0,23,0,0,25,0,22,0,40,0,20,0,0,36,0,30,0,0,30,0,0,30,0,5,0,30,0,35,45,0,24,0,26,0,33,0,32,44,0,32,0,42,0,0,0,15,32,0,0,0,0,37,0,35,0,15,37,42,36,18,36,0,26,0,0,20,40,0,5,0,0,0,37,0,0,0,0,32,42,0,0,0,0,40,0,40,0,20,30,0,30,50,0,20,45,0]
 
 
-doubles_set = {261,262,263,264,265,266,267,268,269,270,271,272,335,770,771,772,773,774,775,776,777,778,779,780,781,782,783,784,785,786,787,788,789,790,791,792,793,794,795,796,797,798,799,800,801}
+doubles_set_emerald = {261,262,263,264,265,266,267,268,269,270,271,272,335,770,771,772,773,774,775,776,777,778,779,780,781,782,783,784,785,786,787,788,789,790,791,792,793,794,795,796,797,798,799,800,801}
 
 
-def calc_iii(em, double_bool, double_all_bool, scale_bool):
+def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, custom_trainer_number):
 	
 	#current integer byte-offset for TRdata
-	#TRdata, start from 0x310058 = 3211352
-	trainer_pointer = 3211352
-	#0x30B62C
-	pokemon_pointer =  3192364
+	#TRdata, Emerald starts from 0x310058 = 3211352, TRPoke 0x30B62C = 3192364
+	
+	#default values
+	
+	#Emerald
+	if(gen_number == 3.2):
+		trainer_pointer = 3211352
+		pokemon_pointer =  3192364
+		max_trainers = 854
+	#FireRed
+	elif(gen_number == 3.1):
+		trainer_pointer = 3211352
+		pokemon_pointer =  3192364
+		max_trainers = 854
+	
+	#set custom offset if entered
+	if(custom_offset != 0):
+		#Don't need the pokemon_pointer, Trdata has the pointers anyway
+		trainer_pointer = custom_offset
+	if(custom_trainer_number != 0):
+		max_trainers = custom_trainer_number
+	
 	trainer_number = 1
 	
 	#iterate over trainers
@@ -24,7 +42,7 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool):
 		#Induce Double Battles as per options
 		
 		#Major trainers
-		if(double_bool and trainer_number in doubles_set and number_pokemon >= 2):
+		if(double_bool and trainer_number in doubles_set_emerald and number_pokemon >= 2):
 			#don't modify if already set to double battle
 			if(em[trainer_pointer + 24]%2 != 1):
 				em[trainer_pointer + 24] += 1
@@ -174,8 +192,7 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool):
 		
 		trainer_pointer += 40 #0x28
 		trainer_number += 1
-		#actual last trainer index is 854, but the last four seem to be dummies, so will not change them
-		if(trainer_number == 850):
+		if(trainer_number == max_trainers):
 			break
 	return(em)
 	
@@ -184,10 +201,7 @@ def get_files_gen_iii():
 	#for Emerald, modify .gba directly
 	
 	#get hex file locations:
-	root = Tk()
-	root.update()
 	rom_location = askopenfilename(filetypes = (("Select Emerald GBA file", "*.*"), (".GBA", "*.gba")))
-	root.destroy()
 	
 	
 	rom = bytearray()
