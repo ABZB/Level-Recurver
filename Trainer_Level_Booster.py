@@ -18,7 +18,7 @@ def nothing_selected():
 	#Msgbox = tk.messagebox.askquestion('Nothing Selected', 'No options were selected, returning to Main Menu', icon = 'warning')
 	print("Nothing Selected")
 
-def main(gen_number, double_bool, double_all_bool, mix_it_up_bool, scale_bool):
+def main(gen_number, double_bool = False, double_all_bool = False, mix_it_up_bool = False, scale_bool = False, custom_offset = '', hex_bool = False, custom_trainer_number = ''):
 	
 	#return to main menu if no options were selected
 	if(not(double_bool or scale_bool)):
@@ -51,13 +51,46 @@ def main(gen_number, double_bool, double_all_bool, mix_it_up_bool, scale_bool):
 		return(False)
 	
 	#Gen III
-	if(gen_number == 3.2):
+	#custom offset handling:
+	if(gen_number == 3.1 or gen_number == 3.2):
+		#0 tells int function to convert string assuming it is in base 10
+		base_value = 0
+		
+		#don't bother with the following if  the custom offset has nothing entered:
+		if(custom_offset != ''):
+			#set the base to 16 if "Hexadecimal Value" was checked
+			if(hex_bool):
+				base_value = 16
+			
+			#try converting the entered custom offset into an integer
+			try:
+				custom_offset = int(custom_offset, base_value)
+			except:
+				print("Invalid Custom Offset entered")
+				return(False)
+		#otherwise, no entry was made, set custom_offset to 0
+		else:
+			custom_offset = 0
+			
+		#don't bother with the following if  the custom offset has nothing entered:
+		if(custom_trainer_number != ''):
+			#try converting the entered custom offset into an integer
+			try:
+				custom_trainer_number = int(custom_trainer_number, 0)
+			except:
+				print("Invalid Custom Trainer Quantity entered")
+				return(False)
+		#otherwise, no entry was made, set custom_trainer_number to 0
+		else:
+			custom_trainer_number = 0
+				
+			
+	if(gen_number == 3.1 or gen_number == 3.2):
 		em, output_path = get_files_gen_iii()
 		
-		em = calc_iii(em, double_bool, double_all_bool, scale_bool)
-		file_name = "Emerald Scaled.gba"
+		em = calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, custom_trainer_number)
 		
-		save_binary_file(em, file_name, output_path)
+		save_binary_file(em, '.gba', output_path)
 
 	#Gen IV
 	elif(gen_number == 4.1 or gen_number == 4.2):
@@ -122,6 +155,11 @@ def main_menu():
 	double_all_bool = BooleanVar()
 	mix_it_up_bool = BooleanVar()
 	scale_bool = BooleanVar()
+	hex_bool = BooleanVar()
+	
+	#string variable for custom offset
+	custom_offset = StringVar()
+	custom_trainer_number = StringVar()
 	
 	#checkboxes and accompanying text
 	Label(master, text = 'Options', font = (16)).grid(row = row_iter)
@@ -144,12 +182,38 @@ def main_menu():
 	
 	row_iter += 1
 	
+	#Custom Trdata offset for FR/Emerald
+	Label(master, text = 'Custom Trainer Data Offset for FireRed/Emerald (Leave blank to use default value):').grid(row = row_iter, sticky = W)
+	
+	row_iter += 1
+	
+	Entry(master, textvariable = custom_offset, bd = 5, exportselection = 0).grid(row = row_iter)
+	
+	row_iter += 1	
+	
+	Checkbutton(master, text = 'Check if Custom Trainer Data Offset is a Hexadecimal Value', variable = hex_bool, onvalue = True, offvalue = False).grid(row = row_iter, sticky = W)
+	
+	row_iter += 1
+	
+	#Custom number of trainers for FR/Emerald
+	Label(master, text = 'Custom number of trainers for FireRed/Emerald (Leave blank to use default value):').grid(row = row_iter, sticky = W)
+	
+	row_iter += 1
+	
+	Entry(master, textvariable = custom_trainer_number, bd = 5, exportselection = 0).grid(row = row_iter)
+	
+	row_iter += 1
+	
 	#game selection
 	Label(master, text = 'Select Game', font = (16)).grid(row = row_iter, pady = 4)
 	
 	row_iter += 1
 	
-	Button(master, text = 'Emerald', command = lambda: main('3.2', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	Button(master, text = 'FireRed', command = lambda: main('3.1', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), hex_bool.get(), custom_trainer_number.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	
+	row_iter += 1
+	
+	Button(master, text = 'Emerald', command = lambda: main('3.2', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), hex_bool.get(), custom_trainer_number.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	
