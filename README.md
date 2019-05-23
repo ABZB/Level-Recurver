@@ -16,13 +16,22 @@ Section I: Purpose
 
 Section II: Description of edits
 
-	Emerald (beta):
+	FireRed (Beta):
+	
+	* Level curve rescaled so the Elite 4 has Pokemon at level 100 the first time (Need to rework level curve formula to mirror the one I made for later Gens).
+	* Currently requires you to enter the offset for Trainer Data and the number of trainers, even for the base game.
+
+	Emerald:
 	
 	* Level curve rescaled so the Elite 4 has Pokemon starting in the mid-90s. Gym Leaders and Team bosses are up to 20 levels higher than surrounding trainers.
 
 	HGSS:
 
 	* Level curve rescaled so the Elite 4 is roughly at the level it is in Generation I games, and Kanto trainers scale from there through level 100 (Kanto Gym Leaders will be leveled in the 90s).
+	
+	Platinum:
+
+	* Level curve scaled so that Pokemon 5 levels less than the maximum level are at level 100.
 	
 	B2W2:
 	
@@ -42,7 +51,18 @@ Section III: Options:
 	
 	* Make as many battles as possible double battles - All trainers with at least 2 Pokemon will now initiate Double Battles. This is only available for Emerald.
 	
-	* Make as many battles as possible Double, Triple, or Rotation battles - All trainers with non-stationary trainer classes (such as Gym Leaders) and at least 3 Pokemon are randomly assigned one of Triple or Rotation battles (this is done when the program is run, every time it is run it will generate a different spread). Stationary trainer classes with at least three Pokemon are randomly assigned one of Double, Triple, or Rotation battles. Stationary trainer classes with exactly two Pokemon are assigned Double battles. All other trainers (including those that are already not single battles) are unchanged.
+	* Make as many battles as possible Double, Triple, or Rotation battles (Black2/White2 only):
+		* All Trainers with exactly 1 Pokemon are unchanged.
+		* Non-stationary Trainers with exactly 1 or 2 Pokemon are unchanged.
+		* Trainers that already challenge you to a Double, Triple, or Rotation battle are unchanged.
+		* Stationary Trainers (such as Gym Leaders) with exactly 2 Pokemon now challenge you to Double Battles.
+		* Stationary Trainers with at least 3 Pokemon now challenge you to a Double, Triple, or Rotation Battle with a 1/3 chance of each per trainer (each one is set when this program is run, not when you actually battle them in-game).
+		* Non-stationary Trainers with 3 or more Pokemon now challenge you to a Single, Triple, or Rotation with a 1/3 chance of each per trainer (each one is set when this program is run, not when you actually battle them in-game).
+		
+	* Custom Offset:
+		* Allows entry of custom offset for Trainer Data for mods with shifted offsets. The user can also select to enter the offset in either Decimal or Hexadecimal.
+	* Custom Trainer count:
+		* Allows entry of custom numbe of trainers for mods with extended trainer lists. The entry must be a positive decimal integer.
 
 Section IV: Instructions
 
