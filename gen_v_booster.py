@@ -6,18 +6,29 @@ evolve_array_bw = [0,2,3,3,5,6,6,8,9,9,11,12,12,14,15,15,17,18,18,20,20,22,22,24
 
 evolve_level_barrier_array_bw = [0,16,32,0,16,36,0,16,36,0,7,10,0,7,10,0,18,36,0,20,0,20,0,22,0,0,0,22,0,16,21,0,16,21,0,5,0,5,0,5,0,22,27,21,26,0,24,0,31,0,26,0,28,0,33,0,28,0,5,0,25,30,0,16,21,0,28,33,0,21,26,0,30,0,25,30,0,40,0,37,0,30,35,0,31,0,34,0,38,0,5,0,25,30,0,5,26,0,28,0,30,0,5,0,28,0,0,0,5,35,0,42,47,52,57,0,32,37,33,0,5,0,0,0,0,5,10,0,0,20,0,0,0,0,0,0,0,30,40,0,40,0,0,0,0,0,0,30,55,0,0,0,16,32,0,14,36,0,18,30,0,15,0,20,0,18,0,22,0,0,27,0,10,10,10,10,30,25,0,15,30,0,0,18,0,0,0,18,27,0,40,5,0,5,40,0,0,0,40,0,40,0,0,0,31,0,0,40,0,23,0,0,0,0,0,30,30,0,38,0,33,38,0,25,0,0,0,0,24,0,0,25,0,40,0,0,20,0,30,30,30,0,0,0,0,0,30,55,0,0,0,0,16,36,0,16,36,0,16,36,0,18,0,20,0,7,10,0,10,0,14,19,0,14,19,0,22,0,25,0,20,30,0,22,0,23,0,18,36,0,20,0,0,20,40,0,24,0,15,30,20,0,0,0,32,42,0,37,0,26,0,0,0,0,0,36,26,0,30,0,40,0,33,0,0,32,0,0,35,45,0,32,0,35,0,0,0,0,0,30,0,30,0,36,0,40,0,40,0,5,0,0,0,37,0,37,42,0,0,0,15,42,0,32,44,0,5,0,0,0,0,30,50,0,20,45,0,0,0,0,0,0,0,0,0,0,0,18,32,0,14,36,0,16,36,0,14,34,0,15,0,10,0,15,30,0,10,0,30,0,30,0,20,0,0,21,0,0,26,0,25,0,30,0,0,28,0,5,0,0,0,38,0,10,34,0,33,0,10,10,10,0,0,24,48,0,30,35,0,34,0,40,0,37,0,0,31,0,30,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,36,0,17,36,0,17,36,0,20,0,16,32,0,20,0,30,0,30,0,30,0,30,0,21,32,0,27,0,25,36,0,0,0,31,0,0,25,0,0,25,36,0,0,0,20,0,0,22,30,0,30,0,30,0,0,29,40,0,35,0,0,34,0,39,0,0,34,0,37,0,37,0,36,0,30,0,30,0,32,41,0,32,41,0,35,0,35,47,0,34,0,0,30,0,39,0,40,0,0,36,0,40,0,38,49,0,39,50,0,42,0,41,50,0,38,48,0,37,0,0,30,0,0,50,0,0,43,0,52,0,0,54,0,54,0,0,0,50,64,0,59,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
-doubles_set = {0, 1, 10, 11, 12, 38, 40, 78, 79, 80, 81, 89, 97, 100, 102, 112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,180,181,182,183,184,185,186,189,190,191,192,193,194,195,196,197,198,199,200,201,227,234,235}
+doubles_set = {0, 1, 10, 11, 12, 38, 40, 61, 62, 78, 79, 80, 81, 89, 97, 100, 102, 112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,180,181,182,183,184,185,186,189,190,191,192,193,194,195,196,197,198,199,200,201,227,234,235}
 
 def calc_v(trdata, trpoke, double_bool, double_all_bool, mix_it_up_bool, scale_bool):
 	
 	trainer_array = []
 	pokemon_array = []
 	
+	
+	pointer_data = 0
+	pointer_poke = 0
+	trainer_number = 1
+
+	
+	#Search for 47 4D 49 46, which always precedes a series of 00 prior to first trainer.
+	#check if using an extended trainer index
+
+	
+	
 	#current integer byte-offset for TRdata
 	#TRdata, start from 0x19B4 = 6580
 	pointer_data = 6580
-	trainer_number = 1
 	max_trainer_index = 813
+	
 	#will have bump at the trainer number location
 	trainer_bump = []
 	
@@ -94,8 +105,12 @@ def calc_v(trdata, trpoke, double_bool, double_all_bool, mix_it_up_bool, scale_b
 	
 	
 	if(scale_bool):
-		#offset initial for trpoke = 19AC = 6572
-		pointer_poke = 6572 + 2 #first level at 0x19AE = 6574
+	
+
+		if(pointer_poke == 0):		
+			#offset initial for trpoke = 19AC = 6572
+			pointer_poke = 6572 + 2 #first level at 0x19AE = 6574
+			
 		pokemon_count = 0
 		total_pokemon = len(trainer_array)
 		
@@ -253,18 +268,33 @@ def get_files_gen_v(gen_number):
 		trpoke_location = askopenfilename(filetypes = (("Select a/0/9/2", "*.*"), ("All Files", "*.*")))
 	
 
-	trpoke = bytearray()
-	trdata = bytearray()
+		trpoke = bytearray()
+		trdata = bytearray()
 
-	#read from file
-	with open(trpoke_location, 'rb') as f:
-		trpoke_bin = f.read()
-	with open(trdata_location, 'rb') as f:
-		trdata_bin = f.read()
+		#read from file
+		with open(trpoke_location, 'rb') as f:
+			trpoke_bin = f.read()
+		with open(trdata_location, 'rb') as f:
+			trdata_bin = f.read()
 
-	#convert the binary data into bytearrays. each index is one hex-pair
-	trpoke = bytearray(trpoke_bin)
-	trdata = bytearray(trdata_bin)
+		#convert the binary data into bytearrays. each index is one hex-pair
+		trpoke = bytearray(trpoke_bin)
+		trdata = bytearray(trdata_bin)
+		return(trdata, trpoke, trpoke_location)
+	
+	if(gen_number == 5.99):
+		trpoke_location = askopenfilename(filetypes = (("Select a/0/9/2", "*.*"), ("All Files", "*.*")))
+	
+
+		trpoke = bytearray()
+
+		#read from file
+		with open(trpoke_location, 'rb') as f:
+			trpoke_bin = f.read()
+
+		#convert the binary data into bytearrays. each index is one hex-pair
+		trpoke = bytearray(trpoke_bin)
+		return(trpoke, trpoke_location)
+	
 		
 	
-	return(trdata, trpoke, trpoke_location)
