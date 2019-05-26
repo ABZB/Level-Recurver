@@ -26,6 +26,7 @@ def calc_iv(trdata, trpoke, double_bool, scale_bool):
 	for i in range(len(trdata)):
 		if(trdata[i] == 71 and trdata[i + 1] == 77 and trdata[i + 2] == 73 and trdata[i + 3 ] == 70):
 			pointer_data = i + 28
+			break
 	
 	if(pointer_data == 0):
 		#HGSS
@@ -95,6 +96,7 @@ def calc_iv(trdata, trpoke, double_bool, scale_bool):
 		for i in range(len(trpoke)):
 			if(trpoke[i] == 71 and trpoke[i + 1] == 77 and trpoke[i + 2] == 73 and trpoke[i + 3 ] == 70):
 				pointer_poke = i + 18
+				break
 		
 		if(pointer_poke == 0):
 			if(gen_number == 4.2):
