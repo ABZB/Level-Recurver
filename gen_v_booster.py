@@ -73,12 +73,13 @@ def calc_v(trdata, trpoke, double_bool, double_all_bool, mix_it_up_bool, scale_b
 				#otherwise, randomly assign one of the battle types other than double
 				elif(number_pokemon > 2):
 					temp = random.randint(1,3)
-					#if the outcome is not Double, set battle type to that
+					#if the outcome is not Double, set battle type to that (definitely won't cause a crash)
 					if(temp != 1):
 						trdata[pointer_data + 2] += temp
 					#if the selection is double, if it won't crash the game, set it to double
-					elif(trdata[pointer_data+1] in doubles_set):
+					elif(trdata[pointer_data + 1] in doubles_set):
 						trdata[pointer_data + 2] += temp
+							
 					#otherwise, leave the battle as a single battle
 						
 		#set AI to proper value (highest bit set to 1) for double/triple values (it prevents them from attacking their own Pokemon)

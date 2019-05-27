@@ -21,7 +21,7 @@ def nothing_selected():
 def main(gen_number, double_bool = False, double_all_bool = False, mix_it_up_bool = False, scale_bool = False, custom_offset = '', hex_bool = False, custom_trainer_number = ''):
 	
 	#return to main menu if no options were selected
-	if(not(double_bool or scale_bool)):
+	if(not(double_bool or double_all_bool or mix_it_up_bool or scale_bool)):
 		nothing_selected()
 		return(False)
 	
