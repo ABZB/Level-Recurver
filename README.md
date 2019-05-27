@@ -19,7 +19,7 @@ Section II: Description of edits
 	FireRed (Beta):
 	
 	* Level curve rescaled so the Elite 4 has Pokemon at level 100 the first time (Need to rework level curve formula to mirror the one I made for later Gens).
-	* Currently requires you to enter the offset for Trainer Data and the number of trainers, even for the base game.
+	* WARNING: Currently requires you to enter the offset for Trainer Data and the number of trainers, even for the base game. Not doing so results in the program using the Emerald default values.
 
 	Emerald:
 	
