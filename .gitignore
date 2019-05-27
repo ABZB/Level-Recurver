@@ -25,3 +25,4 @@ __pycache__/gen_iv_booster.cpython-36.pyc
 *.pyc
 *.pyc
 __pycache__/first_thing.cpython-36.pyc
+*.spec
