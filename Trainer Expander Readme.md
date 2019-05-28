@@ -2,7 +2,9 @@
 
 Section I: Purpose
 
-	* The instructions in Section III set every trainer in the base Black2/White2 game to have a team of 6 Pokemon. This both enhances the difficulty of the game, and in combination with the Level Recurver, allows for setting all battles to be Double, Triple, or Rotation battles.
+	* The instructions in Section III set every trainer in the base Black2/White2 game to have a team of at least 3 Pokemon. This both enhances the difficulty of the game, and in combination with the Level Recurver, allows for setting all battles to be Double, Triple, or Rotation battles.
+	
+	* Setting all trainers to a full party of 6 tends to result in a degree of tediousness, as well as making the level curve far to easy. As such, party sizes range from 3 to 6
 	
 	* This ONLY works for Black 2 and White 2
 	
@@ -10,22 +12,17 @@ Section I: Purpose
 
 Section II: Description of edits
 
-	* Every trainer in the game that has fewer than 6 Pokemon now has 6 Pokemon.
+	* Every trainer in the game Pokemon now has at least 3 Pokemon, with the size of their parties changing as follows:
+		* 1 or 2 -> 3
+		* 3 -> 4
+		* 4 -> 5
+		* 5 -> 6
+		* 6 -> 6 (unchanged)
+	* However, trainers that are intended to be battled as True Double Battles have all been set to have 3 Pokemon (The game otherwise crashes at some point in the battle. I suspect this occurs when the game tries to do display the enemy-team pokeball symbol corresponding to a Pokemon beyond the 3rd, (as the game freezes at the start-of-turn menu where that is displayed, and not when that Pokemon is sent out at the end of the previous turn).
 	
 	* The additional Pokemon are added randomly as follows:
-		* If the nth slot is blank:
-			* From the (n-1)th slot, the following is copied:
-				* custom moves or hold items, if any (even if they make no sense)
-				* Difficulty setting, gender/abilility setting, etc.
-				* level, plus or minus 2
-			* The species of Pokemon is chosen as follows:
-				* A list is constructed of all the base-form Pokemon, excluding the >600 BST legendaries that share at least one type with the (n-1) Pokemon.
-				* One of those Pokemon is chosen out of that list to be the nth Pokemon.
-				* For example, if the Joey originaly has a 3-Pokemon team, with the 3rd Pokemon being a Raticate, the following is a possible filling-in of the rest of his team:
-					* Slot 4 - Pidgey (shares Normal with Raticate)
-					* Slot 5 - Tropius (share Flying with Pidgey)
-					* Slot 6 - Lotad (shares Grass with Tropius.
-				* The intent is that this will create variety while at least somewhat preserving theming of teams.
+		* If all the previous Pokemon of that trainer have a type or types in common, a Pokemon sharing at least one of those types will be selected at random.
+		* If there is no such common type, a Pokemon that has none of those types in common will be selected at random.
 
 Section III: Instructions 
 
@@ -34,7 +31,7 @@ Section III: Instructions
 		(1) Download and install AutoHotKey (https://www.autohotkey.com/).
 		(2) Download BWTE 2 (Black White Trainer Editor 2)
 	
-	* Part B: Setting party sizes to 6
+	* Part B: Setting party sizes to minimum 3
 	
 		(1) Extract a/0/9/1 and a/0/9/2
 		
@@ -50,7 +47,7 @@ Section III: Instructions
 		
 		(7) Use a tool such as kiwi.ds to rebuild a/0/9/1 and a/0/9/2
 		
-		(8) a/0/9/1 is finished, all party sizes are now set to 6.
+		(8) a/0/9/1 is finished, all party sizes are now set to at least 3.
 		
 	* Part C: Filling in the blank party slots
 		

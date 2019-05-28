@@ -13,6 +13,10 @@ type_index = [[0,0],[11,3],[11,3],[11,3],[9,9],[9,9],[9,2],[10,10],[10,10],[10,1
 
 trainer_offset = [0, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 18, 18, 18, 18, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 18, 8, 16, 18, 18, 18, 18, 8, 8, 8, 8, 8, 8, 18, 18, 18, 16, 16, 18, 18, 18, 8, 8, 8, 8, 8, 16, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 8, 8, 8, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 16, 8, 8, 16, 8, 8, 8, 8, 8, 16, 16, 8, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 10, 8, 8, 8, 8, 8, 18, 8, 8, 18, 18, 8, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 18, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 10, 10, 10, 8, 18, 18, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 16, 16, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 18, 18, 18, 16, 16, 16, 8, 8, 8, 16, 18, 18, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 16, 16, 18, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 8, 8, 8, 8, 8, 10, 8, 18, 16, 16, 8, 8, 8, 10, 10, 10, 18, 18, 8, 16, 16, 16, 16, 16, 16, 16, 8, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 8, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 18, 18, 18, 16, 16, 16, 8, 8, 8, 18, 18, 18, 18, 18, 18, 8, 16, 10, 10, 10, 8, 8, 16, 16, 16, 18, 18, 18, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 18, 18, 18, 18, 18, 18, 8, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 8, 8, 8, 8, 8, 8, 8, 8, 10, 10, 10, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 18]
 
+party_count = [0, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 3, 4, 3, 3, 3, 4, 3, 4, 5, 5, 5, 5, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 3, 3, 3, 3, 3, 4, 3, 3, 3, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 6, 6, 4, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 6, 4, 3, 3, 3, 6, 4, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 3, 6, 6, 6, 6, 6, 3, 3, 3, 3, 3, 3, 4, 4, 4, 3, 3, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 6, 3, 3, 6, 6, 3, 4, 4, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 4, 4, 4, 3, 3, 3, 4, 4, 3, 3, 3, 3, 3, 4, 3, 4, 4, 4, 3, 3, 3, 4, 6, 6, 6, 5, 5, 5, 5, 6, 6, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 4, 3, 4, 3, 4, 4, 4, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 4, 4, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 4, 4, 3, 3, 3, 6, 4, 5, 6, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 5, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 3, 3, 4, 3, 3, 5, 5, 4, 4, 6, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 5, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 3, 6, 4, 4, 3, 3, 3, 3, 3, 3, 6, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 4, 4, 3, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 5, 5, 5, 4, 4, 4, 3, 3, 3, 6, 6, 6, 6, 6, 6, 3, 4, 4, 4, 4, 3, 3, 6, 6, 6, 6, 6, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 4, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 4, 3, 3, 4, 6]
+
+#deprecated
+#double_double_set = {4,342,347,356,360,361,362,363,364,365,368,369,370,371,374,375,376,377,494,495,496,513,514,519,520,521,522,588,589,590,602,603,614,615,632,643,644,701,702,703,704,705,727,728,732,733,786,787,788,789,790,791,792,793,794,795,796,797,798,799,807,809}
 
 #takes in bytearray, saves bytes to file
 def save_binary_file(data, file_name, path):
@@ -26,27 +30,18 @@ def save_binary_file(data, file_name, path):
 
 def expand(trpoke):
 	
-	trainer_array = []
-	pokemon_array = []
-	
-	pointer_poke = 0
 	trainer_number = 1
 	trainer_party = 1
-
-	pointer_data = 6580
 	max_trainer_index = 813
 
-
-
-
+	last_index = 0
 	pointer_poke = 6572 #first at 0x19AC = 6572
 		
 	pokemon_count = 0
-	total_pokemon = 813 * 6
-	
 	last_skip = 0
+	
+	type_arr = []
 
-	edit_array = []
 	
 	#pull all the levels, check that they are good:
 	while True:
@@ -64,7 +59,7 @@ def expand(trpoke):
 			trpoke[pointer_poke + 1] = trpoke[pointer_poke + 1 - last_skip] 
 			
 			#copy the level
-			lvl = min(max(trpoke[pointer_poke + 2 - last_skip] + random.randint(-2,2), 1),100)
+			lvl = min(max(trpoke[pointer_poke + 2 - last_skip] + random.randint(0,1), 1),100)
 			
 			if(lvl >= 100 or lvl == 0):
 				print("problem at", pointer_poke)
@@ -76,22 +71,67 @@ def expand(trpoke):
 			last_index = trpoke[pointer_poke + 4 - last_skip]
 			last_index += 256*trpoke[pointer_poke + 5 - last_skip]
 			
-			#get the types
-			type1 = type_index[last_index][0]
-			type2 = type_index[last_index][1]
+			#check if there is a common type to all previous Pokemon:
+			theme_bool = True
+			common_type = []
+			for i in type_arr:
+				#for type and type 2
+				for type in i:
+					#check if type is a common type
+					#If the list of common types is empty
+					if(len(common_type) == 0):
+						check_bool = True
+					#or if it isn't but type isn't in the list of common types
+					elif(not(type in common_type)):
+						check_bool = True
+					#type is already confirmed to be in common
+					else:
+						check_bool = False
+					
+					#run check to see if current type is shared by all Pokemon in the party
+					if(check_bool):
+						for j in type_arr:
+							if(not(type == j[0] or type == j[1])):
+								theme_bool = False
+					#if we found type to be in common, add it to the common types
+					if(theme_bool):
+						common_type.append(type)
+					#otherwise reset theme_bool
+					else:
+						theme_bool = True
+						
+					
+			output_index = 0
 			
-			#get the list of pokemon with the same type1 or type2
-			temp_index = []
-			for thing in base_form:
-				if(thing[0] == type1 or thing[1] == type2 or thing[0] == type2 and thing[1] == type1):
-					temp_index.append(thing[2])
-			
-			#if this is a unique type combo, just use the same one again
-			if(len(temp_index) == 1):
-				output_index = last_index
+			#if common is not empty, choose a Pokemon that shares the common type(s).
+			if(len(common_type) != 0):
+				while True:
+					#pick a random Pokemon form (checking ALL Pokemon, to avoid missing out on type changes via evolution)
+					choice = random.randint(1, len(type_index) - 1)
+					
+					#check if it has any of the common types, and if so, output that and break the loop
+					for type in common_type:
+						if(type == type_index[choice][0] or type == type_index[choice][1]):
+							output_index = choice
+							break
+					if(output_index != 0):
+						break
+							
+							
+			#no type theme
+			#Choose a Pokemon that shares no type with the current team (always possible since 5 Pokemon have at most 10 types between them)
 			else:
-				#choose a random pokemon out of the temp_index
-				output_index = temp_index[random.randint(0, len(temp_index) - 1)]
+				while True:
+					#pick a random Pokemon base form
+					choice = random.randint(1, len(type_index) - 1)
+					
+					#check if it has no type in common with previous Pokemon, and if so, output that and break the loop
+					for type in type_arr:
+						if(type != type_index[choice][0] and type != type_index[choice][1]):
+							output_index = choice
+							break
+					if(output_index != 0):
+						break
 			
 			print("trainer", trainer_number, 'as party member number', trainer_party, "added", output_index, 'difficulty', trpoke[pointer_poke], 'gender', trpoke[pointer_poke + 1], 'level', trpoke[pointer_poke + 2])
 			
@@ -127,31 +167,72 @@ def expand(trpoke):
 			if(skip_number > 14):
 				trpoke[pointer_poke + 16] = trpoke[pointer_poke + 16 - last_skip]
 				trpoke[pointer_poke + 17] = trpoke[pointer_poke + 17 - last_skip]
-				
 			
-		
+		#otherwise, grab the type of the current Pokemon
+		else:	
+			type_arr.append([type_index[last_index][0],type_index[last_index][1]])
 		
 		
 		#if this is the last Pokemon, break
-		if(pokemon_count + 1 >= total_pokemon):
+		if(trainer_number == max_trainer_index and trainer_party == party_count[trainer_number]):
 			break
 		else:
 			#move to the next pokemon
 			last_skip = trainer_offset[trainer_number]
 			pointer_poke += last_skip
-			#increment the pokemon count
-			pokemon_count += 1
 			
-			#if we just did the 6th Pokemon, move to the next trainer:
-			if(trainer_party == 6):
+			#if we just did the last Pokemon for the current trainer, move to the next one
+			if(trainer_party == party_count[trainer_number]):
 				trainer_party = 1
 				trainer_number += 1
 			#otherwise, move to the next party member
 			else:
 				trainer_party += 1
+				
+		#some checks for the wierd offset skips:
+			
+		#+2 is level, can't be more than 100
+		if(trpoke[pointer_poke] == 0 and trpoke[pointer_poke + 1] == 0 and trpoke[pointer_poke + 2] >= 101):
+			pointer_poke += 2
+		#+3 is always blank
+		elif(trpoke[pointer_poke] == 0 and trpoke[pointer_poke + 1] == 0 and trpoke[pointer_poke + 3]!= 0):
+			pointer_poke += 2
 	
 	return(trpoke)
 
+
+#only need to run this once, to get the array of part-counts
+#leaving here for possible future dynamic integration
+def temp_function(trdata):
+
+	trainer_array = []
+	
+	
+	pointer_data = 0
+	trainer_number = 1
+	#current integer byte-offset for TRdata
+	#TRdata, start from 0x19B4 = 6580
+	pointer_data = 6580
+	max_trainer_index = 813
+	
+	party_count = [0]
+	
+	#parse trdata
+	while True:
+		#get # of Pokemon, which is the 3rd hex pair on
+		number_pokemon = trdata[pointer_data + 3] & 7
+		
+		party_count.append(number_pokemon)
+		
+		if(trainer_number == max_trainer_index):
+			break
+		else:
+			trainer_number += 1
+			pointer_data += 20
+	
+	print(party_count)
+	return(True)
+	
 def main():
 	
 	gen_number = 5.1
