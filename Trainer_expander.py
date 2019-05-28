@@ -71,7 +71,7 @@ def expand(trpoke):
 			last_index = trpoke[pointer_poke + 4 - last_skip]
 			last_index += 256*trpoke[pointer_poke + 5 - last_skip]
 			
-			#check if there is a common type to all previous Pokemon:
+			#check if there is a common type to l previous Pokemon:
 			theme_bool = True
 			common_type = []
 			for i in type_arr:
@@ -169,7 +169,7 @@ def expand(trpoke):
 				trpoke[pointer_poke + 17] = trpoke[pointer_poke + 17 - last_skip]
 			
 		#otherwise, grab the type of the current Pokemon
-		else:	
+		else:
 			type_arr.append([type_index[last_index][0],type_index[last_index][1]])
 		
 		
@@ -185,6 +185,8 @@ def expand(trpoke):
 			if(trainer_party == party_count[trainer_number]):
 				trainer_party = 1
 				trainer_number += 1
+				#clear the type array
+				type_arr = []
 			#otherwise, move to the next party member
 			else:
 				trainer_party += 1
