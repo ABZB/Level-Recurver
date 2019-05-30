@@ -35,7 +35,6 @@ def expand(trpoke):
 	trainer_party = 1
 	max_trainer_index = 813
 
-	last_index = 0
 	pointer_poke = 6572 #first at 0x19AC = 6572
 		
 	pokemon_count = 0
@@ -68,38 +67,24 @@ def expand(trpoke):
 			trpoke[pointer_poke + 2] = lvl
 			
 			
-			#get the previous Pokemon index #
-			last_index = trpoke[pointer_poke + 4 - last_skip]
-			last_index += 256*trpoke[pointer_poke + 5 - last_skip]
-			
 			#check if there is a common type to l previous Pokemon:
 			theme_bool = True
 			common_type = []
-			for i in type_arr:
-				#for type and type 2
-				for type in i:
-					#check if type is a common type
-					#If the list of common types is empty
-					if(len(common_type) == 0):
-						check_bool = True
-					#or if it isn't but type isn't in the list of common types
-					elif(not(type in common_type)):
-						check_bool = True
-					#type is already confirmed to be in common
-					else:
-						check_bool = False
+			temp_type = []
+			
+			for i in range(len(type_arr)):
+				#if there is no common type
+				if(common_type == []):
+					#if type1 == type2, just grab it once
+					common_type.append(type_arr[i][0])
 					
-					#run check to see if current type is shared by all Pokemon in the party
-					if(check_bool):
-						for j in type_arr:
-							if(not(type == j[0] or type == j[1])):
-								theme_bool = False
-					#if we found type to be in common, add it to the common types
-					if(theme_bool):
-						common_type.append(type)
-					#otherwise reset theme_bool
-					else:
-						theme_bool = True
+					if(type_arr[i][0] != type_arr[i][1]):
+						common_type.append(type_arr[i][1])
+				#otherwise, if common_type is not empty and neither of the current types are in common_type, we have no theme
+				elif(not(type_arr[i][0] in common_type and type_arr[i][1] in common_type)):
+					theme_bool = False
+					common_type = []
+					break
 						
 					
 			output_index = 0
@@ -112,7 +97,7 @@ def expand(trpoke):
 					
 					choice = base_form[temp][0]
 					
-					#check if it has any of the common types, and if so, output that and break the loop
+					#check if it has any of the common types, and if so, output that and break the loop. Can have at most 2 common types, in which case every Pokemon will be a dual of those 2 types
 					for type in common_type:
 						if(type == type_index[choice][0] or type == type_index[choice][1]):
 							output_index = choice
@@ -137,6 +122,8 @@ def expand(trpoke):
 							break
 					if(output_index != 0):
 						break
+			
+			type_arr.append([type_index[choice][0],type_index[choice][1]])
 			
 			print("trainer", trainer_number, 'as party member number', trainer_party, "added", output_index, 'difficulty', trpoke[pointer_poke], 'gender', trpoke[pointer_poke + 1], 'level', trpoke[pointer_poke + 2])
 			
@@ -175,7 +162,7 @@ def expand(trpoke):
 			
 		#otherwise, grab the type of the current Pokemon
 		else:
-			type_arr.append([type_index[last_index][0],type_index[last_index][1]])
+			type_arr.append([type_index[trpoke[pointer_poke + 4] + 256*trpoke[pointer_poke + 5]][0],type_index[trpoke[pointer_poke + 4] + 256*trpoke[pointer_poke + 5]][1]])
 		
 		
 		#if this is the last Pokemon, break
