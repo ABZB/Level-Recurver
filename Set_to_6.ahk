@@ -13,8 +13,14 @@ Loop, 813
 
 	;First, check if the trainer is a single battle type with a Double Battle AI, if so, set their number of Pokemon to 3
 	
+	;if the trainer is the first rival battle, don't add anything (otherwise you end up in a one-on-three or a glitch)
+
+	;get trainer name
+	Send ^{c}
+	trainer_name := Trim(clipboard)
 	
-	; 13 tabs to AI number, do it in pieces b/c otherwise BWTE gets upset
+	
+	; 13 tabs to AI numberdo it in pieces b/c otherwise BWTE gets upset
 	
 	Loop, 13
 	{
@@ -62,11 +68,19 @@ Loop, 813
 		Sleep 1
 		prty_cnt := Trim(clipboard)
 		;MsgBox % prty_cnt
-
+		
+		;if it's the first rival battle, do nothing
 		if(prty_cnt = 1 or prty_cnt = 2 or prty_cnt = "1" or prty_cnt = "2")
 		{
-			Send {3}
-			Sleep 1
+			if(trainer_name = 'Hugh - 161' or trainer_name = 'Hugh - 162'  or trainer_name = 'Hugh - 163')
+			{
+				Sleep 1
+			}
+			else
+			{
+				Send {3}
+				Sleep 1
+			}
 		}
 		else if(prty_cnt = 3 or prty_cnt = "3")
 		{
