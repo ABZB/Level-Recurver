@@ -194,7 +194,7 @@ def calc_v(trdata, trpoke, double_bool, double_all_bool, mix_it_up_bool, scale_b
 		if(level_to_100 == 100):
 			level_to_100 = 99
 		
-		curve_exponent = 0.5
+		curve_exponent = 0.35
 		
 		curve_divisor = level_to_100**(1+curve_exponent)/(100 - level_to_100)
 		
