@@ -46,10 +46,6 @@ def main(gen_number, double_bool = False, double_all_bool = False, mix_it_up_boo
 		print("Options selected do not work for this generation")
 		return(False)
 	
-	if(double_bool and gen_number == 4.2):
-		print("Double Battle Inducer not currently implented for HGSS")
-		return(False)
-	
 	#Gen III
 	#custom offset handling:
 	if(gen_number == 3.1 or gen_number == 3.2):
@@ -100,12 +96,14 @@ def main(gen_number, double_bool = False, double_all_bool = False, mix_it_up_boo
 		#get the data files and the output path
 		trdata, trpoke, output_path = get_files_gen_iv(gen_number)
 	
-		trpoke, trdata = calc_iv(trdata, trpoke, double_bool, scale_bool)
+		trpoke, trdata = calc_iv(trdata, trpoke, gen_number, double_bool, scale_bool)
 		
+		#HGSS
 		if(gen_number == 4.2):
 			save_binary_file(trdata, '/a/0/5/5', output_path)
 			
 			save_binary_file(trpoke, '/a/0/5/6', output_path)
+		#Platinum
 		elif(gen_number == 4.1):
 			save_binary_file(trdata, 'root/poketool/trainer/trdata', output_path)
 			
@@ -217,11 +215,11 @@ def main_menu():
 	
 	row_iter += 1
 	
-	Button(master, text = 'Heart Gold/Soul Silver (Currently only scaling is available)', command = lambda: main('4.1', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	Button(master, text = 'Heart Gold/Soul Silver (Currently only scaling is available)', command = lambda: main('4.2', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	
-	Button(master, text = 'Platinum', command = lambda: main('4.2', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	Button(master, text = 'Platinum', command = lambda: main('4.1', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	
