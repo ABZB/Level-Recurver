@@ -187,7 +187,7 @@ def calc_v(trdata, trpoke, double_bool, double_all_bool, mix_it_up_bool, scale_b
 		
 		#calculate level curve
 		
-		#The level that will the first level certainly mapped to 100
+		#The level that will the first level mapped to 100
 		level_to_100 = max_level_array[0]/max_level_array[1]
 		
 		#avoid divide by zero, in this case rescaling is minimal anyway
