@@ -7,7 +7,7 @@ evolve_array_hgss = [0,2,3,3,5,6,6,8,9,9,11,12,12,14,15,15,17,18,18,20,20,22,22,
 
 evolve_level_barrier_array_hgss = [0,16,32,0,16,36,0,16,36,0,7,10,0,7,10,0,18,36,0,20,0,20,0,22,0,0,0,22,0,16,21,0,16,21,0,5,0,5,0,5,0,22,27,21,26,0,24,0,31,0,26,0,28,0,33,0,28,0,5,0,25,30,0,16,21,0,28,33,0,21,26,0,30,0,25,30,0,40,0,37,0,30,35,0,31,0,34,0,38,0,5,0,25,30,0,5,26,0,28,0,30,0,5,0,28,0,0,0,5,35,0,42,47,52,57,0,32,37,33,0,5,0,0,0,0,5,10,0,0,20,0,0,0,0,0,0,0,30,40,0,40,0,0,0,0,0,0,30,55,0,0,0,16,32,0,14,36,0,18,30,0,15,0,20,0,18,0,22,0,0,27,0,10,10,10,10,30,25,0,15,30,0,0,18,0,0,0,18,27,0,40,5,0,5,40,0,0,0,40,0,40,0,0,0,31,0,0,40,0,23,0,0,0,0,0,30,30,0,38,0,33,38,0,25,0,0,0,0,24,0,0,25,0,40,0,0,20,0,30,30,30,0,0,0,0,0,30,55,0,0,0,0,16,36,0,16,36,0,16,36,0,18,0,20,0,7,10,0,10,0,14,19,0,14,19,0,22,0,25,0,20,30,0,22,0,23,0,18,36,0,20,0,0,20,40,0,24,0,15,30,20,0,0,0,32,42,0,37,0,26,0,0,0,0,0,36,26,0,30,0,40,0,33,0,0,32,0,0,35,45,0,32,0,35,0,0,0,0,0,30,0,30,0,36,0,40,0,40,0,5,0,0,0,37,0,37,42,0,0,0,15,42,0,32,44,0,5,0,0,0,0,30,50,0,20,45,0,0,0,0,0,0,0,0,0,0,0,18,32,0,14,36,0,16,36,0,14,34,0,15,0,10,0,15,30,0,10,0,30,0,30,0,20,0,0,21,0,0,26,0,25,0,30,0,0,28,0,5,0,0,0,38,0,10,34,0,33,0,10,10,10,0,0,24,48,0,30,35,0,34,0,40,0,37,0,0,31,0,30,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
-tr_class_hgss = {0,1,23,26,27,47,66,67,70,72,73,74,75,76,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,116,117,118,123,124,125,126,127,128}
+tr_class_hgss = {0,1,23,26,27,47,66,67,70,72,73,74,75,76,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,114,116,117,118,123,124,125,126,127,128}
 
 mod_bool = True
 
@@ -148,37 +148,33 @@ def calc_iv(trdata, trpoke, gen_number, double_bool, scale_bool):
 					
 			level = trpoke[pointer_poke]
 			
-			while True:
-				if(level == 0 or level >= 100):
-					level1 = trpoke[pointer_poke+2]
-					level2 = trpoke[pointer_poke-2]
-					print("trying", level1, level2)
+			if(level == 0 or level >= 100):
+				level1 = trpoke[pointer_poke+2]
+				level2 = trpoke[pointer_poke-2]
+				print("trying", level1, level2)
 
-					
-					if((level1 == 0 or level1 >= 100) and (level2 == 0 or level2 >= 100)):
-						print("problem at trainer", 1+trainer_array[pokemon_count][0], "getting value", level, "at", pointer_poke)
-					#two ahead is good but two behind is not
-					elif((level1 > 0 and level1 <= 100) and (level2 == 0 or level2 >= 100)):
-						print("two ahead good", level1, "replacing", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
-						level = level1
-						pointer_poke += 2
-						break
-					#two behind is good but two ahead is not
-					elif((level1 == 0 or level1 >= 100) and (level2 > 0 and level2 <= 100)):
-						print("two behind good", level2, "replacing", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
-						level = level2
-						pointer_poke -= 2
-						break
-					#both good
-					else:
-						print("Both make sense, check manually", level1, level2, "error value", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
-					level = min(level1, level2)
-				#all is well
-				else:
-					break
 				
+				if((level1 == 0 or level1 >= 100) and (level2 == 0 or level2 >= 100)):
+					print("problem at trainer", 1+trainer_array[pokemon_count][0], "getting value", level, "at", pointer_poke)
+				#two ahead is good but two behind is not
+				elif((level1 > 0 and level1 <= 100) and (level2 == 0 or level2 >= 100)):
+					print("two ahead good", level1, "replacing", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
+					level = level1
+					pointer_poke += 2
+					break
+				#two behind is good but two ahead is not
+				elif((level1 == 0 or level1 >= 100) and (level2 > 0 and level2 <= 100)):
+					print("two behind good", level2, "replacing", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
+					level = level2
+					pointer_poke -= 2
+					break
+				#both good
+				else:
+					print("Both make sense, check manually", level1, level2, "error value", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
+				level = min(level1, level2)
 			
-			#level at address pokemon_count
+		
+		#level at address pokemon_count
 			edit_array.append([level, pointer_poke])
 			
 			#keep track of highest and second highest levels, and their counts
