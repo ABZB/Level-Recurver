@@ -84,7 +84,7 @@ def main(gen_number, double_bool = False, double_all_bool = False, mix_it_up_boo
 	if(gen_number == 3.1 or gen_number == 3.2):
 		em, output_path = get_files_gen_iii()
 		
-		em = calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, custom_trainer_number)
+		em = calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, custom_trainer_number, gen_number)
 		
 		save_binary_file(em, '.gba', output_path)
 

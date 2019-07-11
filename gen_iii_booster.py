@@ -7,7 +7,7 @@ evolve_level_barrier_array_iii = [0,16,32,0,16,36,0,16,36,0,7,10,0,7,10,0,18,36,
 doubles_set_emerald = {261,262,263,264,265,266,267,268,269,270,271,272,335,770,771,772,773,774,775,776,777,778,779,780,781,782,783,784,785,786,787,788,789,790,791,792,793,794,795,796,797,798,799,800,801}
 
 
-def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, custom_trainer_number):
+def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, custom_trainer_number, gen_number):
 	
 	#current integer byte-offset for TRdata
 	#TRdata, Emerald starts from 0x310058 = 3211352, TRPoke 0x30B62C = 3192364
@@ -29,10 +29,30 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, custom
 	if(custom_offset != 0):
 		#Don't need the pokemon_pointer, Trdata has the pointers anyway
 		trainer_pointer = custom_offset
-	if(custom_trainer_number != 0):
-		max_trainers = custom_trainer_number
 	
 	trainer_number = 1
+	
+	temp_trainer_pointer = trainer_pointer
+	back_bool = True
+	
+	#find the first TrData endflag (08). Assume that the given address is close the true start of the data
+	while True:
+		#if offset + 39 is the endflag and the following byte makes sense for the first of the next data (is at most 3
+		if(em[trainer_pointer] <= 3 and em[trainer_pointer + 39] == 8 and em[trainer_pointer + 40] <= 3):
+			break
+		#jump back one
+		elif(back_bool and trainer_pointer != 0):
+			trainer_pointer -= 1
+		#if got to start of file, go back to where we started and search forwards
+		elif(back_bool and trainer_pointer == 0):
+			back_bool = False
+			trainer_pointer = temp_trainer_pointer
+		#otherwise, parse forwards
+		else:
+			trainer_pointer += 1
+			
+	#Now we know with reasonable certainty that we are pointing to the start of Trdata.
+	
 	
 	#iterate over trainers
 	while True:
@@ -192,7 +212,15 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, custom
 		
 		trainer_pointer += 40 #0x28
 		trainer_number += 1
-		if(trainer_number == max_trainers):
+		
+		
+		#since each trainer-data has an end flag of 0x08, we just stop when the current trainer pointer + 39 is not 0x08
+		#Some hacks seems to have 0x02 and 0x09 end flags as well.
+		
+		
+		if(em[trainer_pointer + 39] != 2 and em[trainer_pointer + 39] != 8 and em[trainer_pointer + 39] != 9):
+			print("First non-end flag at", trainer_pointer + 39)
+			print(trainer_number, "trainers")
 			break
 	return(em)
 	
