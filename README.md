@@ -19,12 +19,15 @@ Section II: Description of edits
 	FireRed (Beta):
 	
 	* Level curve rescaled so the Elite 4 has Pokemon at level 100 the first time (Need to rework level curve formula to mirror the one I made for later Gens).
-	* WARNING: Currently requires you to enter the offset for Trainer Data and the number of trainers, even for the base game. Not doing so results in the program using the Emerald default values.
 
 	Emerald:
 	
 	* Level curve rescaled so the Elite 4 has Pokemon starting in the mid-90s. Gym Leaders and Team bosses are up to 20 levels higher than surrounding trainers.
-
+	
+	Note: Some features work for ROM HACKS.
+	
+	* Pokemon Gaia - offset 0x23EAF0 = 2353904
+	
 	HGSS:
 
 	* Level curve rescaled so the Elite 4 is roughly at the level it is in Generation I games, and Kanto trainers scale from there through level 100 (Kanto Gym Leaders will be leveled in the 90s).
