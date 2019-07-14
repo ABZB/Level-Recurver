@@ -42,14 +42,14 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, custom
 			break
 		#jump back one
 		elif(back_bool and trainer_pointer != 0):
-			trainer_pointer -= 1
+			trainer_pointer += 1
 		#if got to start of file, go back to where we started and search forwards
 		elif(back_bool and trainer_pointer == 0):
 			back_bool = False
 			trainer_pointer = temp_trainer_pointer
 		#otherwise, parse forwards
 		else:
-			trainer_pointer += 1
+			trainer_pointer -= 1
 			
 	#Now we know with reasonable certainty that we are pointing to the start of Trdata.
 	
