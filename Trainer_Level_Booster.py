@@ -48,7 +48,7 @@ def main(gen_number, double_bool = False, double_all_bool = False, mix_it_up_boo
 	
 	#Gen III
 	#custom offset handling:
-	if(gen_number == 3.1 or gen_number == 3.2):
+	if(gen_number < 4 and gen_number >= 3):
 		#0 tells int function to convert string assuming it is in base 10
 		base_value = 0
 		
@@ -68,7 +68,7 @@ def main(gen_number, double_bool = False, double_all_bool = False, mix_it_up_boo
 		else:
 			custom_offset = 0
 			
-	if(gen_number == 3.1 or gen_number == 3.2):
+	if(gen_number < 4 and gen_number >= 3):
 		em, output_path = get_files_gen_iii()
 		
 		em = calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_number)
@@ -185,6 +185,10 @@ def main_menu():
 	row_iter += 1
 	
 	Button(master, text = 'FireRed', command = lambda: main('3.1', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	
+	row_iter += 1
+	
+	Button(master, text = 'Gaia', command = lambda: main('3.11', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	

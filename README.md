@@ -24,10 +24,6 @@ Section II: Description of edits
 	
 	* Level curve rescaled so the Elite 4 has Pokemon starting in the mid-90s. Gym Leaders and Team bosses are up to 20 levels higher than surrounding trainers.
 	
-	Note: Some features work for ROM HACKS.
-	
-	* Pokemon Gaia - offset 0x23EAF0 = 2353904
-	
 	HGSS:
 
 	* Level curve rescaled so the Elite 4 is roughly at the level it is in Generation I games, and Kanto trainers scale from there through level 100 (Kanto Gym Leaders will be leveled in the 90s).

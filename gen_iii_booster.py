@@ -24,6 +24,9 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, custom
 		trainer_pointer = 3211352
 		pokemon_pointer =  3192364
 		max_trainers = 854
+	#Gaia
+	elif(gen_number == 3.11):
+		trainer_pointer = 2353904 #0x23EAF0
 	
 	#set custom offset if entered
 	if(custom_offset != 0):
