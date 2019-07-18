@@ -11,8 +11,8 @@ evolve_level_barrier_array_iii_gaia = [0,16,32,0,16,36,0,16,36,0,7,10,0,7,10,0,1
 doubles_set_emerald = {261,262,263,264,265,266,267,268,269,270,271,272,335,770,771,772,773,774,775,776,777,778,779,780,781,782,783,784,785,786,787,788,789,790,791,792,793,794,795,796,797,798,799,800,801}
 
 
-#these trainers currently cause glitches when made double
-double_not_set_gaia =[[188, 217, 224, 224, 217, 255, 0, 0],[204, 233, 218, 233, 231, 255, 0, 0]]
+#these trainers currently cause glitches when made double in Gaia
+double_not_set_gaia =[[188, 217, 224, 224, 217, 255, 0, 0],[204, 233, 218, 233, 231, 255, 0, 0],[194, 213, 226, 213, 223, 227, 255, 0]]
 
 
 def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_number):
