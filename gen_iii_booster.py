@@ -11,7 +11,7 @@ doubles_set_emerald = {261,262,263,264,265,266,267,268,269,270,271,272,335,770,7
 
 
 #these trainers currently cause glitches when made double
-double_not_set_gaia ={[188,217,224,224,217,255]}
+double_not_set_gaia =[[188, 217, 224, 224, 217, 255, 0, 0],[204, 233, 218, 233, 231, 255, 0, 0]]
 
 
 def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_number):
@@ -70,7 +70,7 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 	#Now we know with reasonable certainty that we are pointing to the start of Trdata.
 	
 	
-	max_level_array = [50]
+	max_level_array = [0]
 	
 	level_array = []
 	
@@ -92,8 +92,9 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 				if(gen_number != 3.11):
 					em[trainer_pointer + 24] += 1
 				#avoid glitches in Gaia
-				elif(not([em[trainer_pointer + 4], em[trainer_pointer + 5], em[trainer_pointer + 6], em[trainer_pointer + 7], em[trainer_pointer + 8], em[trainer_pointer + 9]] in double_not_set_gaia)):
+				elif(not([em[trainer_pointer + 4], em[trainer_pointer + 5], em[trainer_pointer + 6], em[trainer_pointer + 7], em[trainer_pointer + 8], em[trainer_pointer + 9], em[trainer_pointer + 10], em[trainer_pointer + 11]] in double_not_set_gaia)):
 					em[trainer_pointer + 24] += 1
+					print([em[trainer_pointer + 4], em[trainer_pointer + 5], em[trainer_pointer + 6], em[trainer_pointer + 7], em[trainer_pointer + 8], em[trainer_pointer + 9], em[trainer_pointer + 10], em[trainer_pointer + 11]], "not doubled")
 		
 		if(scale_bool):
 			#Do the Pokemon have hold items? Custom moves?
@@ -104,7 +105,10 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 				pokemon_length = 8
 			#custom moves but no items
 			elif(extra_type == 1):
-				pokemon_length = 14
+				if(gen_number == 3.11):
+					pokemon_length = 16
+				else:
+					pokemon_length = 16
 			elif(extra_type == 3):
 			#hold items and custom moves
 				pokemon_length = 16
@@ -114,42 +118,60 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 			
 			
 			#get the pointer to the trainer's first Pokemon (to check against iterated value)
-			t_pokemon_pointer = em[trainer_pointer + 36] + 256*em[trainer_pointer + 37] + 65536*em[trainer_pointer + 38]
+			pokemon_pointer = em[trainer_pointer + 36] + 256*em[trainer_pointer + 37] + 65536*em[trainer_pointer + 38]
 			
-			next_trainer_pointer = em[trainer_pointer + 36 + 40] + 256*em[trainer_pointer + 37 + 40] + 65536*em[trainer_pointer + 38 + 40]
+			extra_bytes = em[trainer_pointer + 39]
 			
-			allocated_team_length = next_trainer_pointer - t_pokemon_pointer
+			if(extra_bytes >= 9):
+				extra_bytes = (extra_bytes - 8)*16777216
+				pokemon_pointer += extra_bytes
 			
-			allocated_pokemon_length = allocated_team_length/number_pokemon
 			
-			if(allocated_pokemon_length.is_integer()):
-				if(allocated_pokemon_length != pokemon_length):
-					if(allocated_pokemon_length <= 0 or allocated_pokemon_length > 9):
-						print("Pointers are skipping around, will not be able to conduct double check")
-					else:
-						print("Correcting length from", pokemon_length, "to", allocated_pokemon_length)
-						pokemon_length = int(allocated_pokemon_length)
-			else:
-				print("Does not work")
+			if(gen_number != 3.11):
+				next_trainer_pointer = em[trainer_pointer + 36 + 40] + 256*em[trainer_pointer + 37 + 40] + 65536*em[trainer_pointer + 38 + 40]
+				
+				if(extra_bytes >= 9):
+					extra_bytes = (extra_bytes - 8)*16777216
+					next_trainer_pointer += extra_bytes
+					
+				allocated_team_length = next_trainer_pointer - pokemon_pointer
+				
+				allocated_pokemon_length = allocated_team_length/number_pokemon
+				
+				if(allocated_pokemon_length.is_integer()):
+					if(allocated_pokemon_length != pokemon_length):
+						if(allocated_pokemon_length == 8 or allocated_pokemon_length == 16 or allocated_pokemon_length == 14):
+							print("Correcting length from", pokemon_length, "to", allocated_pokemon_length)
+							pokemon_length = int(allocated_pokemon_length)
+			#else:
+			#	print("Does not work")
 			
-			if(t_pokemon_pointer != pokemon_pointer):
-				#print("calculated value is ", t_pokemon_pointer - pokemon_pointer, "less than t_pokemon_pointer")
-				pokemon_pointer = t_pokemon_pointer
 			
+				
+			
+			
+			#print("trainer", trainer_number, "has", number_pokemon, "Pokemon, each", pokemon_length, "long")
 			
 			#iterate over that trainer's Pokemon
 			while True:
 				
+				#avoids glitch if there's a zeroed-out trainer
+				if(pokemon_pointer == 0):
+					break
+					
+					
 				#get level
 				level = em[pokemon_pointer + 2]
+				print("Level", level)
 				#use level * (1 + level/50) = (level + (level^2/50)) = (50 * level + level ^2)/50. Level 10 has (500 + 100)/50 = 600/50 = 60/5 = 12, level 20 has 20*1.4 = 28, level 30 has 30*1.6 = 48, level 40 has 40*1.8 = 72, 50*2 = 100
 				
 				#final check for incorrect values. either level that is too high or too low, or the after-level spot is not 0. The only thing the latter seems to have been causing was turning Roselias into Spheals and Dusclops into Glalies.
-				if(level <= 4 or level >= 79 or em[pokemon_pointer + 2 + 1] != 0):
-					print("Found level of", level, "at", pokemon_pointer)
-					print(trainer_number)
+				if(level <= 1 or level >= 79 or em[pokemon_pointer + 2 + 1] != 0):
+					print("Found level of", level, "at", pokemon_pointer + 2, "trainer number", trainer_number)
 					
 					#Some trainers seem to have allocated space different than expected. If this is the case for the last Pokemon of a trainer, it does not matter, it will be caught by the pointer of the next trainer
+					
+					
 					if(pokemon_length == 14):
 						#Check the position if length should have been 16
 						level = em[pokemon_pointer + 2 + 2]
@@ -181,6 +203,7 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 					#check for encoded-as-8 that is incorrect
 					else:
 						#check if 14 works (check this first, in this case, if 14 is also wrong it will be the low EV value, which is rarely if ever in the level range, while if 16 is wrong it will be the low index value, which is often in the level range
+						
 						level = em[pokemon_pointer + 2 + 6]
 						if((level > 4 or level < 79) and em[pokemon_pointer + 2 + 6 + 1] == 0):
 							#print("Found a 14 that was encoded as 8")
@@ -192,16 +215,33 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 							if((level > 4 or level < 79) and em[pokemon_pointer + 2 + 8 + 1] == 0):
 								#print("Found a 16 that was encoded as 8")
 								pokemon_pointer += 8
-						
-							
-							
-				#computes an estimate of average highest trainer level
-				if(level >= max_level_array[0] and level <= 100):
-					max_level_array[0] = level
-					max_level_array.append(level)
+					print("Modified Level to:", level)	
 				
-				#record pointer to current level
-				level_array.append(pokemon_pointer)
+				
+				#this is for Gaia for now, the Pokemon greater than 60 aren't available yet
+				if(gen_number == 3.11):
+					if(level <= 60):
+						#record the current level
+						max_level_array.append(level)
+						
+						#keep track of highest level
+						if(max_level_array[0] < level):
+							max_level_array[0] = level
+				
+						#record pointer to current level
+						level_array.append(pokemon_pointer)
+						
+				else:
+							
+					#record the current level
+					max_level_array.append(level)
+					
+					#keep track of highest level
+					if(max_level_array[0] < level):
+						max_level_array[0] = level
+					
+					#record pointer to current level
+					level_array.append(pokemon_pointer)
 				
 				#decrement party count of current trainer
 				number_pokemon -= 1
@@ -225,44 +265,62 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 			
 		if(em[trainer_pointer + 39] != 2 and em[trainer_pointer + 39] != 8 and em[trainer_pointer + 39] != 9):
 			print("First non-end flag at", trainer_pointer + 39)
-			print(trainer_number, "trainers")
+			print(trainer_number - 1, "trainers")
 			break
 			
-	
+	#this is for Gaia for now, the Pokemon greater than 60 aren't available yet
+	if(gen_number == 3.11):
+		print("If you are seeing this and you're modifying Gaia Version 4 of or higher, please download the new version or contact me to update")
 	#create curve:
 	#The level that will the first level certainly mapped to 100
-	print("Min max level is", max_level_array[1])
 	print("Max level is", max_level_array[0])
 	
-	level_to_100 = 0
 	
+	
+	meanmaxarr = 0
+	
+	#get average level
 	for x in max_level_array:
-		level_to_100 += x
+		meanmaxarr += x
 		
-	level_to_100 = level_to_100/len(max_level_array)
+	meanmaxarr -= max_level_array[0]
+	
+	meanmaxarr = meanmaxarr/len(max_level_array)
+	
+	print("Average level is", meanmaxarr)
 	
 	
 	#get the median	
-	lenmaxarr = len(max_level_array)
+	lenmaxarr = len(max_level_array) - 1
 	
 	if(lenmaxarr % 2 == 0):
-		medmaxarr = (max_level_array[int(lenmaxarr/2)] + max_level_array[int(lenmaxarr/2 - 1)])/2
+		medmaxarr = (max_level_array[int(lenmaxarr/2) + 1] + max_level_array[int(lenmaxarr/2 - 1) + 1])/2
 	else:
-		medmaxarr = max_level_array[int((lenmaxarr - 1)/2)]
+		medmaxarr = max_level_array[int((lenmaxarr - 1)/2) + 1]
+		
+	print("Median level is", medmaxarr)
 	
-	
-	
-	level_to_100 = (level_to_100 + medmaxarr)/2
+	level_to_50 = (medmaxarr + meanmaxarr)/2
+
+	level_to_100 = max_level_array[0]
 	
 	#avoid divide by zero, in this case rescaling is minimal anyway
 	if(level_to_100 == 100):
 		level_to_100 = 99
 	
-	curve_exponent = 0.5
+	curve_exponent_100 = 0.5
 	
-	curve_divisor = level_to_100**(1+curve_exponent)/(100 - level_to_100)
+	curve_divisor_100 = level_to_100**(1+curve_exponent_100)/(100 - level_to_100)
 	
-	print('Mapping', level_to_100, 'to 100.', 'Curve divisor is', curve_divisor)
+	curve_exponent_50 = 0.5
+	
+	curve_divisor_50 = level_to_50**(1+curve_exponent_50)/(100 - level_to_50)
+	
+	
+	
+	
+	print('Mapping', level_to_50, 'to 50.', 'Curve divisor is', curve_divisor_50)
+	print('Mapping', level_to_100, 'to 100.', 'Curve divisor is', curve_divisor_100)
 	
 	#new while loop, goes through every Pokemon
 	
@@ -276,17 +334,21 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 		level = em[pointer + 2]
 		
 		#function adds to level L (L^(curve_exponent))/(curve_divisor)*100% of L
-		level = level*(1 + (level**curve_exponent)/curve_divisor)
-		level = min(round(level), 100)
+		
+		if(level <= level_to_50):
+			
+			level = level*(1 + (level**curve_exponent_50)/curve_divisor_50)
+			level = min(round(level), 50)
+		else:
+			level = level*(1 + (level**curve_exponent_100)/curve_divisor_100)
+			level = min(round(level), 100)
 		
 	
 	
 				
 		#If the Pokemon should be evolved, evolve it. Will evolve any unevolved Pokemon that is 5 or more levels above the minimum level
-		low_digits = em[pointer + 4]
-		high_digits = em[pointer + 5]
 		
-		index = low_digits + 256*high_digits
+		index = em[pointer + 4] + 256*em[pointer + 5]
 
 		#If the Pokemon is past the level it evolves at by level-up
 		try:	
@@ -294,13 +356,13 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 				new_index = evolve_array_iii[index]
 				if(new_index != index):
 					
-					#convert back to hex pairs
-					low_digits = new_index%256
-					high_digits = int((new_index - low_digits)/256)
-					
-					#write
-					em[pointer + 4] = low_digits
-					em[pointer + 5] = high_digits
+					#convert back to hex pairs & write
+					em[pointer + 4] = new_index%256
+					try:
+						em[pointer + 5] = int((new_index - low_digits)/256)
+					#the above throws an error if the high bytes are 0
+					except:
+						em[pointer + 5] = 0
 					modify_count[0] += 1
 				else:
 					modify_count[1] += 1
@@ -310,8 +372,9 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 			em[pointer + 2] = level
 		
 		except:
-			print("Error at ",pointer)
-			
+			print("Error at ",pointer, index)
+	
+	print(len(evolve_level_barrier_array_iii), len(evolve_array_iii))
 	print("Evolved", modify_count[0], "out of", modify_count[0] + modify_count[1], "Pokemon")
 		
 	return(em)
