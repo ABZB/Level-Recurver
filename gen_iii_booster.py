@@ -1,4 +1,5 @@
 from first_thing import *
+
 evolve_array_iii_default = [0,2,3,3,5,6,6,8,9,9,11,12,12,14,15,15,17,18,18,20,20,22,22,24,24,26,26,28,28,30,31,31,33,34,34,36,36,38,38,40,40,42,169,44,45,45,47,47,49,49,51,51,53,53,55,55,57,57,59,59,61,62,62,64,65,65,67,68,68,70,71,71,73,73,75,76,76,78,78,80,80,82,82,83,85,85,87,87,89,89,91,91,93,94,94,208,97,97,99,99,101,101,103,103,105,105,106,107,108,110,110,112,112,242,114,115,117,230,119,119,121,121,122,123,124,125,162,127,128,130,130,131,132,134,134,135,136,137,139,139,141,141,142,143,144,145,146,148,149,149,150,151,153,154,154,156,157,157,159,160,160,162,162,164,164,166,166,168,168,169,171,171,25,35,39,175,176,178,178,180,181,181,182,184,184,185,186,188,189,189,190,192,192,193,195,195,196,197,198,199,200,201,202,203,205,205,206,207,208,210,210,211,212,213,214,215,217,217,219,219,220,221,222,224,224,225,226,227,229,229,230,232,232,233,234,235,237,237,124,125,126,241,242,243,244,245,247,248,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,278,279,279,281,282,282,284,285,285,287,287,289,289,291,292,292,294,294,296,297,297,299,300,300,302,302,303,305,305,307,307,308,310,310,312,312,314,314,316,316,317,319,319,313,321,322,324,324,325,327,327,329,329,331,331,333,334,334,336,336,338,338,340,340,342,343,343,345,345,347,347,348,349,12,352,352,353,354,355,357,357,359,359,202,362,362,363,365,366,366,368,368,369,371,372,372,374,374,375,376,378,378,379,380,381,383,384,384,385,386,387,389,389,391,391,393,394,394,396,397,397,399,400,400]
 
 evolve_level_barrier_array_iii_default = [0,16,32,0,16,36,0,16,36,0,7,10,0,7,10,0,18,36,0,20,0,20,0,22,0,100,0,22,0,16,21,0,16,21,0,5,0,50,0,5,0,22,27,21,26,0,24,0,31,0,26,0,28,0,33,0,28,0,5,0,25,30,0,16,21,0,28,33,0,21,26,0,30,0,25,30,0,40,0,37,0,30,35,0,31,0,34,0,38,0,5,0,25,30,0,5,26,0,28,0,30,0,5,0,28,0,0,0,5,35,0,42,47,52,57,0,32,37,33,0,5,0,0,0,0,5,10,0,0,20,0,0,0,0,0,0,0,30,40,0,40,0,0,0,0,0,0,30,55,0,0,0,16,32,0,14,36,0,18,30,0,15,0,20,0,18,0,22,0,0,27,0,10,10,10,10,30,25,0,15,30,0,0,18,0,0,0,18,27,0,40,5,0,5,40,0,0,0,40,0,40,0,0,0,31,0,0,40,0,23,0,0,0,0,0,30,30,0,38,0,33,38,0,25,0,0,0,0,24,0,0,25,0,40,0,0,20,0,30,30,30,0,0,0,0,0,30,55,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,36,0,16,36,0,16,36,0,18,0,20,0,7,10,0,10,0,14,19,0,14,19,0,20,0,0,22,0,23,0,0,25,0,22,0,40,0,20,0,0,36,0,30,0,0,30,0,0,30,0,5,0,30,0,35,45,0,24,0,26,0,33,0,32,44,0,32,0,42,0,0,0,15,32,0,0,0,0,37,0,35,0,15,37,42,36,18,36,0,26,0,0,20,40,0,5,0,0,0,37,0,0,0,0,32,42,0,0,0,0,40,0,40,0,20,30,0,30,50,0,20,45,0]
@@ -69,8 +70,8 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 			
 	#Now we know with reasonable certainty that we are pointing to the start of Trdata.
 	
-	
-	max_level_array = [0]
+	#increment the ith place by one for each occurence of the level i
+	max_level_array = [0]*101
 	
 	level_array = []
 	
@@ -162,7 +163,7 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 					
 				#get level
 				level = em[pokemon_pointer + 2]
-				print("Level", level)
+				#print("Level", level)
 				#use level * (1 + level/50) = (level + (level^2/50)) = (50 * level + level ^2)/50. Level 10 has (500 + 100)/50 = 600/50 = 60/5 = 12, level 20 has 20*1.4 = 28, level 30 has 30*1.6 = 48, level 40 has 40*1.8 = 72, 50*2 = 100
 				
 				#final check for incorrect values. either level that is too high or too low, or the after-level spot is not 0. The only thing the latter seems to have been causing was turning Roselias into Spheals and Dusclops into Glalies.
@@ -222,7 +223,7 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 				if(gen_number == 3.11):
 					if(level <= 60):
 						#record the current level
-						max_level_array.append(level)
+						max_level_array[level] += 1
 						
 						#keep track of highest level
 						if(max_level_array[0] < level):
@@ -234,7 +235,7 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 				else:
 							
 					#record the current level
-					max_level_array.append(level)
+					max_level_array[level] += 1
 					
 					#keep track of highest level
 					if(max_level_array[0] < level):
@@ -271,80 +272,83 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 	#this is for Gaia for now, the Pokemon greater than 60 aren't available yet
 	if(gen_number == 3.11):
 		print("If you are seeing this and you're modifying Gaia Version 4 of or higher, please download the new version or contact me to update")
-	#create curve:
-	#The level that will the first level certainly mapped to 100
-	print("Max level is", max_level_array[0])
-	
-	
 	
 	meanmaxarr = 0
-	
+	div = 0
 	#get average level
-	for x in max_level_array:
-		meanmaxarr += x
-		
-	meanmaxarr -= max_level_array[0]
+	for x in range(1,min(max_level_array[0] + 1,100)):
+		meanmaxarr += max_level_array[x]*x
+		div += max_level_array[x]
 	
-	meanmaxarr = meanmaxarr/len(max_level_array)
+	meanmaxarr = meanmaxarr/div
 	
 	print("Average level is", meanmaxarr)
 	
+	temp = []
+	#get median
+	for x in range(1,min(max_level_array[0] + 1,100)):
+		zzz = [x]*max_level_array[x]
+		temp.extend(zzz)
+	medmaxarr = median(temp)
 	
-	#get the median	
-	lenmaxarr = len(max_level_array) - 1
-	
-	if(lenmaxarr % 2 == 0):
-		medmaxarr = (max_level_array[int(lenmaxarr/2) + 1] + max_level_array[int(lenmaxarr/2 - 1) + 1])/2
-	else:
-		medmaxarr = max_level_array[int((lenmaxarr - 1)/2) + 1]
-		
 	print("Median level is", medmaxarr)
 	
-	level_to_50 = (medmaxarr + meanmaxarr)/2
+	
+	level_to_50 = medmaxarr
 
-	level_to_100 = max_level_array[0]
-	
-	#avoid divide by zero, in this case rescaling is minimal anyway
-	if(level_to_100 == 100):
-		level_to_100 = 99
-	
-	curve_exponent_100 = 0.5
-	
-	curve_divisor_100 = level_to_100**(1+curve_exponent_100)/(100 - level_to_100)
+
 	
 	curve_exponent_50 = 0.5
 	
-	curve_divisor_50 = level_to_50**(1+curve_exponent_50)/(100 - level_to_50)
+	curve_divisor_50 = level_to_50**(1+curve_exponent_50)/(50 - level_to_50)
 	
 	
 	
 	
-	print('Mapping', level_to_50, 'to 50.', 'Curve divisor is', curve_divisor_50)
-	print('Mapping', level_to_100, 'to 100.', 'Curve divisor is', curve_divisor_100)
+	print('Initially mapping', level_to_50, 'to 50.', 'Curve divisor is', curve_divisor_50)
 	
 	#new while loop, goes through every Pokemon
 	
-	print(len(level_array))
+	#create lookup table for modification
+	print("Table as follows:")
+	print("Initial Level |", "Output Level")
+	
+	change_table = [0]*101
+	
+	for j in range(1, max_level_array[0] + 1):
+		#first scale entire table by the level 50 curve:
+		level = j*(1 + (j**curve_exponent_50)/curve_divisor_50)
+		level = min(round(level), 100)
+		change_table[j] = level
+		
+	#need to add 100 - change_table[max_level_array[0]]
+	addendum = 100 - change_table[max_level_array[0]] + 1
+	
+	if(addendum > 0):
+		iter = 0
+		while True:
+			#adds the full needed addition to the highest level, then one less than that to the second-highest, etc.
+			change_table[max_level_array[0] + 1 - iter] += addendum
+			addendum -= 1
+			
+			#if addendum is now 0, we've added all we needed to
+			if(addendum == 0):
+				break
+			else:
+				iter += 1
+	
+	
+	for j in range(1, max_level_array[0] + 1):
+		print(j, "|", change_table[j])
 	
 	modify_count = [0,0]
-	
 	for pointer in level_array:
 		
-		#getlevel
+		#get level
 		level = em[pointer + 2]
 		
-		#function adds to level L (L^(curve_exponent))/(curve_divisor)*100% of L
-		
-		if(level <= level_to_50):
-			
-			level = level*(1 + (level**curve_exponent_50)/curve_divisor_50)
-			level = min(round(level), 50)
-		else:
-			level = level*(1 + (level**curve_exponent_100)/curve_divisor_100)
-			level = min(round(level), 100)
-		
-	
-	
+		#get new level from lookup table
+		level = change_table[level]
 				
 		#If the Pokemon should be evolved, evolve it. Will evolve any unevolved Pokemon that is 5 or more levels above the minimum level
 		
@@ -374,9 +378,12 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 		except:
 			print("Error at ",pointer, index)
 	
-	print(len(evolve_level_barrier_array_iii), len(evolve_array_iii))
 	print("Evolved", modify_count[0], "out of", modify_count[0] + modify_count[1], "Pokemon")
-		
+	
+
+	
+
+	
 	return(em)
 	
 def get_files_gen_iii():

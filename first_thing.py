@@ -6,3 +6,4 @@ from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
 import binascii
 import os
+from statistics import median
