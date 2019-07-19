@@ -18,10 +18,10 @@ def nothing_selected():
 	#Msgbox = tk.messagebox.askquestion('Nothing Selected', 'No options were selected, returning to Main Menu', icon = 'warning')
 	print("Nothing Selected")
 
-def main(gen_number, double_bool = False, double_all_bool = False, mix_it_up_bool = False, scale_bool = False, custom_offset = '', hex_bool = False):
+def main(gen_number, double_bool = False, double_all_bool = False, mix_it_up_bool = False, scale_bool = False, custom_offset = '', evolve_bool = False, hex_bool = False):
 	
 	#return to main menu if no options were selected
-	if(not(double_bool or double_all_bool or mix_it_up_bool or scale_bool)):
+	if(not(double_bool or double_all_bool or mix_it_up_bool or scale_bool or evolve_bool)):
 		nothing_selected()
 		return(False)
 	
@@ -71,7 +71,7 @@ def main(gen_number, double_bool = False, double_all_bool = False, mix_it_up_boo
 	if(gen_number < 4 and gen_number >= 3):
 		em, output_path = get_files_gen_iii()
 		
-		em = calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_number)
+		em = calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_offset, gen_number)
 		
 		save_binary_file(em, '.gba', output_path)
 
@@ -140,6 +140,7 @@ def main_menu():
 	double_all_bool = BooleanVar()
 	mix_it_up_bool = BooleanVar()
 	scale_bool = BooleanVar()
+	evolve_bool = BooleanVar()
 	hex_bool = BooleanVar()
 	
 	#string variable for custom offset
@@ -166,6 +167,10 @@ def main_menu():
 	
 	row_iter += 1
 	
+	Checkbutton(master, text = 'Evolve Pokemon that are past the level they evolve at', variable = evolve_bool, onvalue = True, offvalue = False).grid(row = row_iter, sticky = W)
+	
+	row_iter += 1
+	
 	#Custom Trdata offset for FR/Emerald
 	Label(master, text = 'Custom Trainer Data Offset for FireRed/Emerald (Leave blank to use default value):').grid(row = row_iter, sticky = W)
 	
@@ -184,15 +189,15 @@ def main_menu():
 	
 	row_iter += 1
 	
-	Button(master, text = 'FireRed', command = lambda: main('3.1', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	Button(master, text = 'FireRed', command = lambda: main('3.1', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	
-	Button(master, text = 'Gaia', command = lambda: main('3.11', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	Button(master, text = 'Gaia', command = lambda: main('3.11', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	
-	Button(master, text = 'Emerald', command = lambda: main('3.2', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	Button(master, text = 'Emerald', command = lambda: main('3.2', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	

@@ -15,7 +15,7 @@ doubles_set_emerald = {261,262,263,264,265,266,267,268,269,270,271,272,335,770,7
 double_not_set_gaia =[[188, 217, 224, 224, 217, 255, 0, 0],[204, 233, 218, 233, 231, 255, 0, 0],[194, 213, 226, 213, 223, 227, 255, 0]]
 
 
-def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_number):
+def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_offset, gen_number):
 	#current integer byte-offset for TRdata
 	#TRdata, Emerald starts from 0x310058 = 3211352, TRPoke 0x30B62C = 3192364
 	
@@ -27,20 +27,20 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 		pokemon_pointer =  3192364
 		max_trainers = 854
 		evolve_array_iii = evolve_array_iii_default
-		evolve_level_barrier_array_iii = evolve_array_iii_default
+		evolve_level_barrier_array_iii = evolve_level_barrier_array_iii_default
 	#FireRed
 	elif(gen_number == 3.1):
 		trainer_pointer = 3211352
 		pokemon_pointer =  3192364
 		max_trainers = 854
 		evolve_array_iii = evolve_array_iii_default
-		evolve_level_barrier_array_iii = evolve_array_iii_default
+		evolve_level_barrier_array_iii = evolve_level_barrier_array_iii_default
 	#Gaia
 	elif(gen_number == 3.11):
 		trainer_pointer = 2353904 #0x23EAF0
 		pokemon_pointer =  9225576
 		evolve_array_iii = evolve_array_iii_gaia
-		evolve_level_barrier_array_iii = evolve_array_iii_gaia
+		evolve_level_barrier_array_iii = evolve_level_barrier_array_iii_gaia
 	
 	#set custom offset if entered
 	if(custom_offset != 0):
@@ -97,7 +97,7 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 					em[trainer_pointer + 24] += 1
 					print([em[trainer_pointer + 4], em[trainer_pointer + 5], em[trainer_pointer + 6], em[trainer_pointer + 7], em[trainer_pointer + 8], em[trainer_pointer + 9], em[trainer_pointer + 10], em[trainer_pointer + 11]], "not doubled")
 		
-		if(scale_bool):
+		if(scale_bool or evolve_bool):
 			#Do the Pokemon have hold items? Custom moves?
 			extra_type = em[trainer_pointer]
 			
@@ -167,7 +167,7 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 				#use level * (1 + level/50) = (level + (level^2/50)) = (50 * level + level ^2)/50. Level 10 has (500 + 100)/50 = 600/50 = 60/5 = 12, level 20 has 20*1.4 = 28, level 30 has 30*1.6 = 48, level 40 has 40*1.8 = 72, 50*2 = 100
 				
 				#final check for incorrect values. either level that is too high or too low, or the after-level spot is not 0. The only thing the latter seems to have been causing was turning Roselias into Spheals and Dusclops into Glalies.
-				if(level <= 1 or level >= 79 or em[pokemon_pointer + 2 + 1] != 0):
+				if(level == 0 or level > 100 or em[pokemon_pointer + 2 + 1] != 0):
 					print("Found level of", level, "at", pokemon_pointer + 2, "trainer number", trainer_number)
 					
 					#Some trainers seem to have allocated space different than expected. If this is the case for the last Pokemon of a trainer, it does not matter, it will be caught by the pointer of the next trainer
@@ -176,13 +176,13 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 					if(pokemon_length == 14):
 						#Check the position if length should have been 16
 						level = em[pokemon_pointer + 2 + 2]
-						if((level > 4 or level < 79) and em[pokemon_pointer + 2 + 2 + 1] == 0):
+						if((level > 0 or level <= 100) and em[pokemon_pointer + 2 + 2 + 1] == 0):
 							#print("Found a 16 that was encoded as 14")
 							pokemon_pointer += 2
 						#check if length 8 works
 						else:
 							level = em[pokemon_pointer + 2 - 6]
-							if((level > 4 or level < 79) and em[pokemon_pointer + 2 - 6 + 1] == 0):
+							if((level > 0 or level <= 100) and em[pokemon_pointer + 2 - 6 + 1] == 0):
 								#print("Found an 8 that was encoded as 14")
 								pokemon_pointer -= 6
 								
@@ -190,14 +190,14 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 					elif(pokemon_length == 16):
 						#check if 14 works
 						level = em[pokemon_pointer + 2 - 2]
-						if((level > 4 or level < 79) and em[pokemon_pointer + 2 - 2 + 1] == 0):
+						if((level > 0 or level <= 100) and em[pokemon_pointer + 2 - 2 + 1] == 0):
 							#print("Found a 14 that was encoded as 16")
 							pokemon_pointer -= 2
 						
 						#otherwise check if 8 works
 						else:
 							level = em[pokemon_pointer + 2 - 8]
-							if((level > 4 or level < 79) and em[pokemon_pointer + 2 - 8 + 1] == 0):
+							if((level > 0 or level <= 100) and em[pokemon_pointer + 2 - 8 + 1] == 0):
 								#print("Found an 8 that was encoded as 16")
 								pokemon_pointer -= 8
 								
@@ -206,14 +206,14 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 						#check if 14 works (check this first, in this case, if 14 is also wrong it will be the low EV value, which is rarely if ever in the level range, while if 16 is wrong it will be the low index value, which is often in the level range
 						
 						level = em[pokemon_pointer + 2 + 6]
-						if((level > 4 or level < 79) and em[pokemon_pointer + 2 + 6 + 1] == 0):
+						if((level > 0 or level <= 100) and em[pokemon_pointer + 2 + 6 + 1] == 0):
 							#print("Found a 14 that was encoded as 8")
 							pokemon_pointer += 6
 						
 						#otherwise check if 16 works
 						else:
 							level = em[pokemon_pointer + 2 + 8]
-							if((level > 4 or level < 79) and em[pokemon_pointer + 2 + 8 + 1] == 0):
+							if((level > 0 or level <= 100) and em[pokemon_pointer + 2 + 8 + 1] == 0):
 								#print("Found a 16 that was encoded as 8")
 								pokemon_pointer += 8
 					print("Modified Level to:", level)	
@@ -305,41 +305,40 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 	
 	
 	
-	print('Initially mapping', level_to_50, 'to 50.', 'Curve divisor is', curve_divisor_50)
+	#print('Initially mapping', level_to_50, 'to 50.', 'Curve divisor is', curve_divisor_50)
 	
-	#new while loop, goes through every Pokemon
-	
-	#create lookup table for modification
-	print("Table as follows:")
-	print("Initial Level |", "Output Level")
-	
-	change_table = [0]*101
-	
-	for j in range(1, max_level_array[0] + 1):
-		#first scale entire table by the level 50 curve:
-		level = j*(1 + (j**curve_exponent_50)/curve_divisor_50)
-		level = min(round(level), 100)
-		change_table[j] = level
+	if(scale_bool):
+		#create lookup table for modification
+		print("Table as follows:")
+		print("Initial Level |", "Output Level")
 		
-	#need to add 100 - change_table[max_level_array[0]]
-	addendum = 100 - change_table[max_level_array[0]] + 1
-	
-	if(addendum > 0):
-		iter = 0
-		while True:
-			#adds the full needed addition to the highest level, then one less than that to the second-highest, etc.
-			change_table[max_level_array[0] + 1 - iter] += addendum
-			addendum -= 1
+		change_table = [0]*101
+		
+		for j in range(1, max_level_array[0] + 1):
+			#first scale entire table by the level 50 curve:
+			level = j*(1 + (j**curve_exponent_50)/curve_divisor_50)
+			level = min(round(level), 100)
+			change_table[j] = level
 			
-			#if addendum is now 0, we've added all we needed to
-			if(addendum == 0):
-				break
-			else:
-				iter += 1
+		#need to add 100 - change_table[max_level_array[0]]
+		addendum = 100 - change_table[max_level_array[0]] + 1
+		
+		if(addendum > 0):
+			iter = 0
+			while True:
+				#adds the full needed addition to the highest level, then one less than that to the second-highest, etc.
+				change_table[max_level_array[0] + 1 - iter] += addendum
+				addendum -= 1
+				
+				#if addendum is now 0, we've added all we needed to
+				if(addendum == 0):
+					break
+				else:
+					iter += 1
 	
 	
-	for j in range(1, max_level_array[0] + 1):
-		print(j, "|", change_table[j])
+		for j in range(1, max_level_array[0] + 1):
+			print(j, "|", change_table[j])
 	
 	modify_count = [0,0]
 	for pointer in level_array:
@@ -348,15 +347,16 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 		level = em[pointer + 2]
 		
 		#get new level from lookup table
-		level = change_table[level]
+		if(scale_bool):	
+			level = change_table[level]
 				
-		#If the Pokemon should be evolved, evolve it. Will evolve any unevolved Pokemon that is 5 or more levels above the minimum level
+		#If the Pokemon should be evolved, evolve it. Will evolve any unevolved Pokemon that is above the minimum level
 		
 		index = em[pointer + 4] + 256*em[pointer + 5]
-
+		
 		#If the Pokemon is past the level it evolves at by level-up
 		try:	
-			if(level >= evolve_level_barrier_array_iii[index]):
+			if(level >= evolve_level_barrier_array_iii[index] and evolve_bool):
 				new_index = evolve_array_iii[index]
 				if(new_index != index):
 					
@@ -373,7 +373,8 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, custom_offset, gen_nu
 			else:
 				modify_count[1] += 1
 			#write level now, so that if the index doesn't make sense, we don't write anything
-			em[pointer + 2] = level
+			if(scale_bool):
+				em[pointer + 2] = level
 		
 		except:
 			print("Error at ",pointer, index)
