@@ -24,21 +24,21 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 	#Emerald
 	if(gen_number == 3.2):
 		trainer_pointer = 3211352
-		pokemon_pointer =  3192364
+		#pokemon_pointer =  3192364
 		max_trainers = 854
 		evolve_array_iii = evolve_array_iii_default
 		evolve_level_barrier_array_iii = evolve_level_barrier_array_iii_default
 	#FireRed
 	elif(gen_number == 3.1):
-		trainer_pointer = 3211352
-		pokemon_pointer =  3192364
+		trainer_pointer = 2353864 #23EAC8
+		#pokemon_pointer =  3192364
 		max_trainers = 854
 		evolve_array_iii = evolve_array_iii_default
 		evolve_level_barrier_array_iii = evolve_level_barrier_array_iii_default
 	#Gaia
 	elif(gen_number == 3.11):
 		trainer_pointer = 2353904 #0x23EAF0
-		pokemon_pointer =  9225576
+		#pokemon_pointer =  9225576
 		evolve_array_iii = evolve_array_iii_gaia
 		evolve_level_barrier_array_iii = evolve_level_barrier_array_iii_gaia
 	
@@ -51,6 +51,9 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 	
 	temp_trainer_pointer = trainer_pointer
 	back_bool = True
+	
+	unparsable_pokemon = [0]
+	
 	
 	#find the first TrData endflag (08). Assume that the given address is close the true start of the data
 	while True:
@@ -68,6 +71,7 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 		else:
 			trainer_pointer -= 1
 			
+	print(trainer_pointer)
 	#Now we know with reasonable certainty that we are pointing to the start of Trdata.
 	
 	#increment the ith place by one for each occurence of the level i
@@ -75,12 +79,22 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 	
 	level_array = []
 	
+	gaia_double_error_check = True
+	
 	#iterate over trainers
 	while True:
 		#get the number of Pokemon the trainer has
 		number_pokemon = em[trainer_pointer + 32]
 	
 		#Induce Double Battles as per options
+		
+		#get trainer name for Gaia
+		if(gen_number == 3.11 and (double_bool or double_all_bool)):
+			trainer_name_array = [em[trainer_pointer + 4], em[trainer_pointer + 5], em[trainer_pointer + 6], em[trainer_pointer + 7], em[trainer_pointer + 8], em[trainer_pointer + 9], em[trainer_pointer + 10], em[trainer_pointer + 11]]
+			#check if name is one of the error-names
+			for arr in double_not_set_gaia:
+				if(array_equality(trainer_name_array, arr)):
+					gaia_double_error_check = False
 		
 		#Major trainers
 		if(double_bool and trainer_number in doubles_set_emerald and number_pokemon >= 2):
@@ -93,9 +107,11 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 				if(gen_number != 3.11):
 					em[trainer_pointer + 24] += 1
 				#avoid glitches in Gaia
-				elif(not([em[trainer_pointer + 4], em[trainer_pointer + 5], em[trainer_pointer + 6], em[trainer_pointer + 7], em[trainer_pointer + 8], em[trainer_pointer + 9], em[trainer_pointer + 10], em[trainer_pointer + 11]] in double_not_set_gaia)):
+				elif(gaia_double_error_check):
 					em[trainer_pointer + 24] += 1
-					print([em[trainer_pointer + 4], em[trainer_pointer + 5], em[trainer_pointer + 6], em[trainer_pointer + 7], em[trainer_pointer + 8], em[trainer_pointer + 9], em[trainer_pointer + 10], em[trainer_pointer + 11]], "not doubled")
+				else:
+					print("Trainer name-code", trainer_name_array, "Index Number", trainer_number, "not doubled")
+		
 		
 		if(scale_bool or evolve_bool):
 			#Do the Pokemon have hold items? Custom moves?
@@ -107,9 +123,9 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 			#custom moves but no items
 			elif(extra_type == 1):
 				if(gen_number == 3.11):
-					pokemon_length = 16
+					pokemon_length = 14
 				else:
-					pokemon_length = 16
+					pokemon_length = 14
 			elif(extra_type == 3):
 			#hold items and custom moves
 				pokemon_length = 16
@@ -167,7 +183,7 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 				#use level * (1 + level/50) = (level + (level^2/50)) = (50 * level + level ^2)/50. Level 10 has (500 + 100)/50 = 600/50 = 60/5 = 12, level 20 has 20*1.4 = 28, level 30 has 30*1.6 = 48, level 40 has 40*1.8 = 72, 50*2 = 100
 				
 				#final check for incorrect values. either level that is too high or too low, or the after-level spot is not 0. The only thing the latter seems to have been causing was turning Roselias into Spheals and Dusclops into Glalies.
-				if(level == 0 or level > 100 or em[pokemon_pointer + 2 + 1] != 0):
+				if(level == 0 or level > 100): #or em[pokemon_pointer + 2 + 1] != 0):
 					print("Found level of", level, "at", pokemon_pointer + 2, "trainer number", trainer_number)
 					
 					#Some trainers seem to have allocated space different than expected. If this is the case for the last Pokemon of a trainer, it does not matter, it will be caught by the pointer of the next trainer
@@ -218,32 +234,42 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 								pokemon_pointer += 8
 					print("Modified Level to:", level)	
 				
-				
-				#this is for Gaia for now, the Pokemon greater than 60 aren't available yet
-				if(gen_number == 3.11):
-					if(level <= 60):
-						#record the current level
-						max_level_array[level] += 1
+				#final catch for incorrectly parsed Pokemon Data
+				try:
+					if(level <= 100 and level > 0):
+						#this is for Gaia for now, the Pokemon greater than 60 aren't available yet
+						if(gen_number == 3.11):
+							if(level <= 60):
+								#record the current level
+								max_level_array[level] += 1
+								
+								#keep track of highest level
+								if(max_level_array[0] < level):
+									max_level_array[0] = level
 						
-						#keep track of highest level
-						if(max_level_array[0] < level):
-							max_level_array[0] = level
-				
-						#record pointer to current level
-						level_array.append(pokemon_pointer)
-						
-				else:
+								#record pointer to current level
+								level_array.append(pokemon_pointer)
+								
+						else:
+							#record the current level
+							max_level_array[level] += 1
 							
-					#record the current level
-					max_level_array[level] += 1
-					
-					#keep track of highest level
-					if(max_level_array[0] < level):
-						max_level_array[0] = level
-					
-					#record pointer to current level
-					level_array.append(pokemon_pointer)
+							#keep track of highest level
+							if(max_level_array[0] < level):
+								max_level_array[0] = level
+							
+							#record pointer to current level
+							level_array.append(pokemon_pointer)
+					else:
+						print("Could not parse this Pokemon, skipping.")
+						unparsable_pokemon[0] += 1
+						unparsable_pokemon.append(pokemon_pointer)
+				except:
+					print("Could not parse this Pokemon, skipping.")
+					unparsable_pokemon[0] += 1
+					unparsable_pokemon.append(pokemon_pointer)
 				
+					
 				#decrement party count of current trainer
 				number_pokemon -= 1
 				
@@ -257,6 +283,7 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 				
 		trainer_pointer += 40 #0x28
 		trainer_number += 1
+		gaia_double_error_check = True
 		
 		
 		#since each trainer-data has an end flag of 0x08, we just stop when the current trainer pointer + 39 is not 0x08
@@ -313,7 +340,6 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 		print("Initial Level |", "Output Level")
 		
 		change_table = [0]*101
-		
 		for j in range(1, max_level_array[0] + 1):
 			#first scale entire table by the level 50 curve:
 			level = j*(1 + (j**curve_exponent_50)/curve_divisor_50)
@@ -321,7 +347,7 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 			change_table[j] = level
 			
 		#need to add 100 - change_table[max_level_array[0]]
-		addendum = 100 - change_table[max_level_array[0]] + 1
+		addendum = 100 - change_table[max_level_array[0]]
 		
 		if(addendum > 0):
 			iter = 0
@@ -363,7 +389,7 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 					#convert back to hex pairs & write
 					em[pointer + 4] = new_index%256
 					try:
-						em[pointer + 5] = int((new_index - low_digits)/256)
+						em[pointer + 5] = int((new_index)/256)
 					#the above throws an error if the high bytes are 0
 					except:
 						em[pointer + 5] = 0
@@ -381,6 +407,8 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 	
 	print("Evolved", modify_count[0], "out of", modify_count[0] + modify_count[1], "Pokemon")
 	
+	if(unparsable_pokemon[0] > 0):
+		print("A total of", unparsable_pokemon[0], "Pokemon were odd, and could not be parsed. This might be be a result of Trainers that were not actually implemented in the game. If there are more than just a few of these, there might be a glitch in this program, or there might be something unusual about the game being modified.")
 
 	
 
