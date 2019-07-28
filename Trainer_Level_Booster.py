@@ -197,6 +197,10 @@ def main_menu():
 	
 	row_iter += 1
 	
+	Button(master, text = 'Ultra Shiny Gold Sigma', command = lambda: main('3.12', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	
+	row_iter += 1
+	
 	Button(master, text = 'Emerald', command = lambda: main('3.2', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
