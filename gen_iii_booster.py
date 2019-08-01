@@ -2,7 +2,7 @@ from first_thing import *
 from gen_iii_arrays import *
 
 
-def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_offset, gen_number):
+def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool, custom_offset, gen_number):
 	#current integer byte-offset for TRdata
 	#TRdata, Emerald starts from 0x310058 = 3211352, TRPoke 0x30B62C = 3192364
 	
@@ -15,11 +15,15 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 		max_trainers = 854
 		evolve_array_iii = evolve_array_iii_default
 		evolve_level_barrier_array_iii = evolve_level_barrier_array_iii_default
+	#Theta Emerald Renev
+	elif(gen_number == 3.21):
+		trainer_pointer = 3211352#0x310058
+		evolve_array_iii = evolve_array_iii_etr
+		evolve_level_barrier_array_iii = evolve_level_barrier_array_iii_etr
 	#FireRed
 	elif(gen_number == 3.1):
 		trainer_pointer = 2353864 #23EAC8
 		#pokemon_pointer =  3192364
-		max_trainers = 854
 		evolve_array_iii = evolve_array_iii_default
 		evolve_level_barrier_array_iii = evolve_level_barrier_array_iii_default
 	#Gaia
@@ -88,22 +92,21 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 				if(array_equality(trainer_name_array, arr)):
 					gaia_double_error_check = False
 		
-		#Major trainers
-		if(double_bool and trainer_number in doubles_set_emerald and number_pokemon >= 2):
-			#don't modify if already set to double battle
-			if(em[trainer_pointer + 24]%2 != 1):
-				em[trainer_pointer + 24] += 1
-		#Anyone with enough Pokemon
-		if(double_all_bool and number_pokemon >= 2):
-			if(em[trainer_pointer + 24]%2 != 1):
-				if(gen_number != 3.11):
-					em[trainer_pointer + 24] += 1
-				#avoid glitches in Gaia
-				elif(gaia_double_error_check):
-					em[trainer_pointer + 24] += 1
-				else:
-					print("Trainer name-code", trainer_name_array, "Index Number", trainer_number, "not doubled")
-		
+		#Major trainers or Anyone with enough Pokemon
+		if((double_bool and trainer_number in doubles_set_emerald and number_pokemon >= 2) or double_all_bool and number_pokemon >= 2):
+			#avoid glitches in Gaia
+			if(gen_number != 3.11 or gaia_double_error_check):
+				#don't modify if already set to double battle
+				em[trainer_pointer + 24] += 1&~em[trainer_pointer + 24]
+				#set double battle AI
+				em[trainer_pointer + 28] += 128&~em[trainer_pointer + 28]
+			else:
+				print("Trainer name-code", trainer_name_array, "Index Number", trainer_number, "not doubled.")
+	
+		#set AI to maximum difficulty:
+		if(ai_bool):
+			#~flips the bits of the current value, bitwise & with 7 leaves only whatever of 1, 2, and 4 it doesn't have, which is then added to whatever is there
+			em[trainer_pointer + 28] += 7&~em[trainer_pointer + 28]
 		
 		if(scale_bool or evolve_bool):
 			#Do the Pokemon have hold items? Custom moves?
@@ -303,129 +306,130 @@ def calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_o
 	if(gen_number == 3.11):
 		print("If you are seeing this and you're modifying Gaia Version 4 of or higher, please download the new version or contact me to update")
 	
-	meanmaxarr = 0
-	div = 0
-	#get average level
-	for x in range(1,min(max_level_array[0] + 1,100)):
-		meanmaxarr += max_level_array[x]*x
-		div += max_level_array[x]
-	
-	meanmaxarr = meanmaxarr/div
-	
-	print("Average level is", meanmaxarr)
-	
-	temp = []
-	#get median
-	for x in range(1,min(max_level_array[0] + 1,100)):
-		zzz = [x]*max_level_array[x]
-		temp.extend(zzz)
-	medmaxarr = median(temp)
-	
-	print("Median level is", medmaxarr)
-	
-	
-	#figure out what to map to 50
-	while True:
-		#If either is less than 50, use whichever is less
-		if(int(medmaxarr) <= 45 or int(meanmaxarr) <= 45):
-			level_to_50 = min(medmaxarr, meanmaxarr)
-			break
-		#otherwise, truncate the top 10% of the level array and use median of that
-		else:
-			print("Current level curve has median level close to 50. This implies that the level curve might already be rather steep, and in particular that this program might already have been run on it. Will now remove the top percentile of levels from consideration and recalculate. (This message might appear multiple times)")
-			
-			print("Reducing list from", len(temp), "Pokemon to")
-			
-			del temp[-int(round(len(temp)/10)):]
-			medmaxarr = median(temp)
-			
-			print(len(temp), "Pokemon.")
-			print("The new median is", medmaxarr, ".")
-	
-	curve_exponent_50 = 0.5
-	
-	curve_divisor_50 = level_to_50**(1+curve_exponent_50)/(50 - level_to_50)
-	
-	
-	
-	
-	print('Initially mapping', level_to_50, 'to 50.', 'Curve divisor is', curve_divisor_50)
-	
-	if(scale_bool):
-		#create lookup table for modification
-		print("Table as follows:")
-		print("Initial Level |", "Output Level")
+	if(scale_bool or evolve_bool):
+		meanmaxarr = 0
+		div = 0
+		#get average level
+		for x in range(1,min(max_level_array[0] + 1,100)):
+			meanmaxarr += max_level_array[x]*x
+			div += max_level_array[x]
 		
-		change_table = [0]*101
-		for j in range(1, max_level_array[0] + 1):
-			#first scale entire table by the level 50 curve:
-			level = j*(1 + (j**curve_exponent_50)/curve_divisor_50)
-			level = min(round(level), 100)
-			change_table[j] = level
-			
-		#need to add 100 - change_table[max_level_array[0]]
-		addendum = 100 - change_table[max_level_array[0]]
+		meanmaxarr = meanmaxarr/div
 		
-		if(addendum > 0):
-			iter = 0
-			while True:
-				#adds the full needed addition to the highest level, then one less than that to the second-highest, etc.
-				change_table[min(max_level_array[0] + 2 - iter, 100)] += addendum
-				addendum -= 1
+		print("Average level is", meanmaxarr)
+		
+		temp = []
+		#get median
+		for x in range(1,min(max_level_array[0] + 1,100)):
+			zzz = [x]*max_level_array[x]
+			temp.extend(zzz)
+		medmaxarr = median(temp)
+		
+		print("Median level is", medmaxarr)
+		
+		
+		#figure out what to map to 50
+		while True:
+			#If either is less than 50, use whichever is less
+			if(int(medmaxarr) <= 45 or int(meanmaxarr) <= 45):
+				level_to_50 = min(medmaxarr, meanmaxarr)
+				break
+			#otherwise, truncate the top 10% of the level array and use median of that
+			else:
+				print("Current level curve has median level close to 50. This implies that the level curve might already be rather steep, and in particular that this program might already have been run on it. Will now remove the top percentile of levels from consideration and recalculate. (This message might appear multiple times)")
 				
-				#if addendum is now 0, we've added all we needed to
-				if(addendum == 0):
-					break
-				else:
-					iter += 1
-	
-	
-		for j in range(1, max_level_array[0] + 1):
-			print(j, "|", change_table[j])
-	
-	modify_count = [0,0]
-	for pointer in level_array:
-		
-		#get level
-		level = em[pointer + 2]
-		
-		#get new level from lookup table
-		if(scale_bool):	
-			level = change_table[level]
+				print("Reducing list from", len(temp), "Pokemon to")
 				
-		#If the Pokemon should be evolved, evolve it. Will evolve any unevolved Pokemon that is above the minimum level
+				del temp[-int(round(len(temp)/10)):]
+				medmaxarr = median(temp)
+				
+				print(len(temp), "Pokemon.")
+				print("The new median is", medmaxarr, ".")
 		
-		index = em[pointer + 4] + 256*em[pointer + 5]
+		curve_exponent_50 = 0.5
 		
-		#If the Pokemon is past the level it evolves at by level-up
-		try:	
-			if(level >= evolve_level_barrier_array_iii[index] and evolve_bool):
-				new_index = evolve_array_iii[index]
-				if(new_index != index):
+		curve_divisor_50 = level_to_50**(1+curve_exponent_50)/(50 - level_to_50)
+		
+		
+		
+		
+		print('Initially mapping', level_to_50, 'to 50.', 'Curve divisor is', curve_divisor_50)
+		
+		if(scale_bool):
+			#create lookup table for modification
+			print("Table as follows:")
+			print("Initial Level |", "Output Level")
+			
+			change_table = [0]*101
+			for j in range(1, max_level_array[0] + 1):
+				#first scale entire table by the level 50 curve:
+				level = j*(1 + (j**curve_exponent_50)/curve_divisor_50)
+				level = min(round(level), 100)
+				change_table[j] = level
+				
+			#need to add 100 - change_table[max_level_array[0]]
+			addendum = 100 - change_table[max_level_array[0]]
+			
+			if(addendum > 0):
+				iter = 0
+				while True:
+					#adds the full needed addition to the highest level, then one less than that to the second-highest, etc.
+					change_table[min(max_level_array[0] + 2 - iter, 100)] += addendum
+					addendum -= 1
 					
-					#convert back to hex pairs & write
-					em[pointer + 4] = new_index%256
-					try:
-						em[pointer + 5] = int((new_index)/256)
-					#the above throws an error if the high bytes are 0
-					except:
-						em[pointer + 5] = 0
-					modify_count[0] += 1
+					#if addendum is now 0, we've added all we needed to
+					if(addendum == 0):
+						break
+					else:
+						iter += 1
+		
+		
+			for j in range(1, max_level_array[0] + 1):
+				print(j, "|", change_table[j])
+		
+		modify_count = [0,0]
+		for pointer in level_array:
+			
+			#get level
+			level = em[pointer + 2]
+			
+			#get new level from lookup table
+			if(scale_bool):	
+				level = change_table[level]
+					
+			#If the Pokemon should be evolved, evolve it. Will evolve any unevolved Pokemon that is above the minimum level
+			
+			index = em[pointer + 4] + 256*em[pointer + 5]
+			
+			#If the Pokemon is past the level it evolves at by level-up
+			try:	
+				if(level >= evolve_level_barrier_array_iii[index] and evolve_bool):
+					new_index = evolve_array_iii[index]
+					if(new_index != index):
+						
+						#convert back to hex pairs & write
+						em[pointer + 4] = new_index%256
+						try:
+							em[pointer + 5] = int((new_index)/256)
+						#the above throws an error if the high bytes are 0
+						except:
+							em[pointer + 5] = 0
+						modify_count[0] += 1
+					else:
+						modify_count[1] += 1
 				else:
 					modify_count[1] += 1
-			else:
-				modify_count[1] += 1
-			#write level now, so that if the index doesn't make sense, we don't write anything
-			if(scale_bool):
-				em[pointer + 2] = level
+				#write level now, so that if the index doesn't make sense, we don't write anything
+				if(scale_bool):
+					em[pointer + 2] = level
+			
+			except:
+				print("Error at ",pointer, index)
 		
-		except:
-			print("Error at ",pointer, index)
-	
-	print("Evolved", modify_count[0], "out of", modify_count[0] + modify_count[1], "Pokemon")
-	
-	if(unparsable_pokemon[0] > 0):
-		print("A total of", unparsable_pokemon[0], "Pokemon were odd, and could not be parsed. This might be a result of Trainers that were not actually implemented in the game. If there are more than just a few of these, there might be a glitch in this program, or there might be something unusual about the game being modified.")
+		print("Evolved", modify_count[0], "out of", modify_count[0] + modify_count[1], "Pokemon")
+		
+		if(unparsable_pokemon[0] > 0):
+			print("A total of", unparsable_pokemon[0], "Pokemon were odd, and could not be parsed. This might be a result of Trainers that were not actually implemented in the game. If there are more than just a few of these, there might be a glitch in this program, or there might be something unusual about the game being modified.")
 
 	
 

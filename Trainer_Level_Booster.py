@@ -18,7 +18,7 @@ def nothing_selected():
 	#Msgbox = tk.messagebox.askquestion('Nothing Selected', 'No options were selected, returning to Main Menu', icon = 'warning')
 	print("Nothing Selected")
 
-def main(gen_number, double_bool = False, double_all_bool = False, mix_it_up_bool = False, scale_bool = False, custom_offset = '', evolve_bool = False, hex_bool = False):
+def main(gen_number, ai_bool = False, double_bool = False, double_all_bool = False, mix_it_up_bool = False, scale_bool = False, custom_offset = '', evolve_bool = False, hex_bool = False):
 	
 	#return to main menu if no options were selected
 	if(not(double_bool or double_all_bool or mix_it_up_bool or scale_bool or evolve_bool)):
@@ -71,7 +71,7 @@ def main(gen_number, double_bool = False, double_all_bool = False, mix_it_up_boo
 	if(gen_number < 4 and gen_number >= 3):
 		em, output_path = get_files_gen_iii()
 		
-		em = calc_iii(em, double_bool, double_all_bool, scale_bool, evolve_bool, custom_offset, gen_number)
+		em = calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool, custom_offset, gen_number)
 		
 		save_binary_file(em, '.gba', output_path)
 
@@ -136,6 +136,7 @@ def main_menu():
 	#Mods to apply
 	
 	#booleans variables for checkboxes
+	ai_bool = BooleanVar()
 	double_bool = BooleanVar()
 	double_all_bool = BooleanVar()
 	mix_it_up_bool = BooleanVar()
@@ -148,6 +149,10 @@ def main_menu():
 	
 	#checkboxes and accompanying text
 	Label(master, text = 'Options', font = (16)).grid(row = row_iter)
+	
+	row_iter += 1
+	
+	Checkbutton(master, text = 'Set Enemy Trainer AI to maximum difficulty', variable = ai_bool, onvalue = True, offvalue = False).grid(row = row_iter, sticky = W)
 	
 	row_iter += 1
 	
@@ -189,19 +194,23 @@ def main_menu():
 	
 	row_iter += 1
 	
-	Button(master, text = 'FireRed', command = lambda: main('3.1', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	Button(master, text = 'FireRed', command = lambda: main('3.1', ai_bool.get(), double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	
-	Button(master, text = 'Gaia', command = lambda: main('3.11', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	Button(master, text = 'Gaia', command = lambda: main('3.11', ai_bool.get(), double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	
-	Button(master, text = 'Ultra Shiny Gold Sigma', command = lambda: main('3.12', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	Button(master, text = 'Ultra Shiny Gold Sigma', command = lambda: main('3.12', ai_bool.get(), double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	
-	Button(master, text = 'Emerald', command = lambda: main('3.2', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	Button(master, text = 'Emerald', command = lambda: main('3.2', ai_bool.get(), double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	
+	row_iter += 1
+	
+	Button(master, text = 'Theta Emerald Renev', command = lambda: main('3.21', ai_bool.get(), double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get(), hex_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	
