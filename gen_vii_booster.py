@@ -49,7 +49,7 @@ def calc_vii(trdata, trpoke, double_all_bool, scale_bool, evolve_bool):
 			
 			#if they have 3 or 4 Pokemon, 50% chance of double battle
 			#if 5 or 6 Pokemon, always double battle
-			if((random.randint(1,2) == 1 and number_pokemon <= 4) or number_pokemon > 4):
+			if(True):#(random.randint(1,2) == 1 and number_pokemon <= 4) or number_pokemon > 4):
 				trdata[pointer_data + 2] = 1
 				#set double battle AI
 				trdata[pointer_data + 12] += 8
