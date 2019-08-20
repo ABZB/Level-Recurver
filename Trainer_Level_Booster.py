@@ -1,6 +1,7 @@
 from gen_iii_booster import *
 from gen_iv_booster import *
 from gen_v_booster import *
+from gen_vii_booster import *
 
 #takes in bytearray, saves bytes to file
 def save_binary_file(data, file_name, path):
@@ -45,6 +46,11 @@ def main(gen_number, ai_bool = False, double_bool = False, double_all_bool = Fal
 	if(mix_it_up_bool and gen_number < 5):
 		print("Options selected do not work for this generation")
 		return(False)
+	
+	if(gen_number == 7.1 and (mix_it_up_bool or double_bool)):
+		print("Options selected do not work for this generation")
+		return(False)
+		
 	
 	#Gen III
 	#custom offset handling:
@@ -106,23 +112,17 @@ def main(gen_number, ai_bool = False, double_bool = False, double_all_bool = Fal
 			save_binary_file(trdata, '1.narc', output_path)
 		if(scale_bool):
 			save_binary_file(trpoke, '2.narc', output_path)
-		
-	#merge below into Gen IV and Platinum
-	else:
-		return(False)
-		#get the data files and the output path
-		trdata, output_path = get_files_gen_iv(gen_number)
-		
-		print('working 1')
+			
 	
-		#trpoke = calc_iv(trdata, trpoke)
-		
-		print(len(trdata))
-		trdata = doublify(trdata)
+	elif(gen_number == 7.1):
 	
-		#seperates the file name (always a single character from HGSS on) from path
+		trdata, trpoke, output_path = get_files_gen_vii(gen_number)
+		trpoke, trdata = calc_vii(trdata, trpoke, double_all_bool, scale_bool, evolve_bool)
 	
-		save_binary_file(trdata, 'trdata.narc', output_path)
+		if(double_all_bool or scale_bool_bool or evolve_bool):
+			save_binary_file(trdata, '6', output_path)
+		if(scale_bool):
+			save_binary_file(trpoke, '7', output_path)
 		
 
 def main_menu():
@@ -160,7 +160,7 @@ def main_menu():
 	
 	row_iter += 1
 	
-	Checkbutton(master, text = 'Make as many battles as possible double battles (Gen III only)', variable = double_all_bool, onvalue = True, offvalue = False).grid(row = row_iter, sticky = W)
+	Checkbutton(master, text = 'Make as many battles as possible double battles (Gen III and VII only)', variable = double_all_bool, onvalue = True, offvalue = False).grid(row = row_iter, sticky = W)
 	
 	row_iter += 1
 	
@@ -214,15 +214,19 @@ def main_menu():
 	
 	row_iter += 1
 	
-	Button(master, text = 'Heart Gold/Soul Silver', command = lambda: main('4.2', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	Button(master, text = 'Heart Gold/Soul Silver', command = lambda: main('4.2', ai_bool.get(), double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	
-	Button(master, text = 'Platinum', command = lambda: main('4.1', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	Button(master, text = 'Platinum', command = lambda: main('4.1', ai_bool.get(), double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	
-	Button(master, text = 'Black2/White2', command = lambda: main('5.1', double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	Button(master, text = 'Black2/White2', command = lambda: main('5.1', ai_bool.get(), double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	
+	row_iter += 1
+	
+	Button(master, text = 'Ultra Sun/Ultra Moon', command = lambda: main('7.1', ai_bool.get(), double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	
