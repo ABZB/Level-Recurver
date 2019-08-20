@@ -7,7 +7,7 @@ def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool,
 	#TRdata, Emerald starts from 0x310058 = 3211352, TRPoke 0x30B62C = 3192364
 	
 	#default values
-	
+	game_max_level = 100
 	#Emerald
 	if(gen_number == 3.2):
 		trainer_pointer = 3211352
@@ -37,6 +37,12 @@ def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool,
 		trainer_pointer = 2353904 #0x23EAF0
 		evolve_array_iii = evolve_array_iii_usgs
 		evolve_level_barrier_array_iii = evolve_level_barrier_array_iii_usgs
+	#Nameless Fire Red
+	elif(gen_number == 3.13):
+		trainer_pointer = 2357424 #0x23F8B0
+		evolve_array_iii = evolve_array_iii_nfr
+		evolve_level_barrier_array_iii = evolve_level_barrier_array_iii_nfr
+		game_max_level = 70
 	
 	#set custom offset if entered
 	if(custom_offset != 0):
@@ -47,6 +53,7 @@ def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool,
 	
 	temp_trainer_pointer = trainer_pointer
 	back_bool = True
+	end_loop_flag = False
 	
 	unparsable_pokemon = [0]
 	
@@ -54,7 +61,7 @@ def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool,
 	#find the first TrData endflag (08). Assume that the given address is close the true start of the data
 	while True:
 		#if offset + 39 is the endflag and the following byte makes sense for the first of the next data (is at most 3
-		if(em[trainer_pointer] <= 3 and em[trainer_pointer + 39] == 8 and em[trainer_pointer + 40] <= 3):
+		if(em[trainer_pointer] <= 3 and (em[trainer_pointer + 39] == 8 or em[trainer_pointer + 39] == 9) and em[trainer_pointer + 40] <= 3):
 			break
 		#jump back one
 		elif(back_bool and trainer_pointer != 0):
@@ -93,7 +100,7 @@ def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool,
 					gaia_double_error_check = False
 		
 		#Major trainers or Anyone with enough Pokemon
-		if((double_bool and trainer_number in doubles_set_emerald and number_pokemon >= 2) or double_all_bool and number_pokemon >= 2):
+		if((double_bool and trainer_number in doubles_set_emerald and number_pokemon >= 2) or (double_all_bool and number_pokemon >= 3)):
 			#avoid glitches in Gaia
 			if(gen_number != 3.11 or gaia_double_error_check):
 				#don't modify if already set to double battle
@@ -139,22 +146,22 @@ def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool,
 				pokemon_pointer += extra_bytes
 			
 			
-			if(gen_number != 3.11):
+			if(gen_number != 3.11 and gen_number != 3.13):
 				next_trainer_pointer = em[trainer_pointer + 36 + 40] + 256*em[trainer_pointer + 37 + 40] + 65536*em[trainer_pointer + 38 + 40]
 				
 				if(extra_bytes >= 9):
 					extra_bytes = (extra_bytes - 8)*16777216
 					next_trainer_pointer += extra_bytes
 					
-				allocated_team_length = next_trainer_pointer - pokemon_pointer
+				if(number_pokemon >= 8 and number_pokemon <= 16):
+					allocated_team_length = next_trainer_pointer - pokemon_pointer
+					allocated_pokemon_length = allocated_team_length/number_pokemon
+					if(allocated_pokemon_length.is_integer()):
+						if(allocated_pokemon_length != pokemon_length):
+							if(allocated_pokemon_length == 8 or allocated_pokemon_length == 16 or allocated_pokemon_length == 14):
+								print("Correcting length from", pokemon_length, "to", allocated_pokemon_length)
+								pokemon_length = int(allocated_pokemon_length)
 				
-				allocated_pokemon_length = allocated_team_length/number_pokemon
-				
-				if(allocated_pokemon_length.is_integer()):
-					if(allocated_pokemon_length != pokemon_length):
-						if(allocated_pokemon_length == 8 or allocated_pokemon_length == 16 or allocated_pokemon_length == 14):
-							print("Correcting length from", pokemon_length, "to", allocated_pokemon_length)
-							pokemon_length = int(allocated_pokemon_length)
 			#else:
 			#	print("Does not work")
 			
@@ -172,15 +179,13 @@ def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool,
 				#avoids glitch if there's a zeroed-out trainer
 				if(pokemon_pointer == 0):
 					break
-					
-					
 				#get level
 				level = em[pokemon_pointer + 2]
 				#print("Level", level)
 				#use level * (1 + level/50) = (level + (level^2/50)) = (50 * level + level ^2)/50. Level 10 has (500 + 100)/50 = 600/50 = 60/5 = 12, level 20 has 20*1.4 = 28, level 30 has 30*1.6 = 48, level 40 has 40*1.8 = 72, 50*2 = 100
 				
 				#final check for incorrect values. either level that is too high or too low, or the after-level spot is not 0. The only thing the latter seems to have been causing was turning Roselias into Spheals and Dusclops into Glalies.
-				if(level == 0 or level > 100): #or em[pokemon_pointer + 2 + 1] != 0):
+				if(level == 0 or level > 100 or level > game_max_level): #or em[pokemon_pointer + 2 + 1] != 0):
 					print("Found level of", level, "at", pokemon_pointer + 2, "trainer number", trainer_number)
 					
 					#Some trainers seem to have allocated space different than expected. If this is the case for the last Pokemon of a trainer, it does not matter, it will be caught by the pointer of the next trainer
@@ -189,13 +194,13 @@ def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool,
 					if(pokemon_length == 14):
 						#Check the position if length should have been 16
 						level = em[pokemon_pointer + 2 + 2]
-						if((level > 0 or level <= 100) and em[pokemon_pointer + 2 + 2 + 1] == 0):
+						if((level > 0 and level <= 100 and level <= game_max_level) and em[pokemon_pointer + 2 + 2 + 1] == 0):
 							#print("Found a 16 that was encoded as 14")
 							pokemon_pointer += 2
 						#check if length 8 works
 						else:
 							level = em[pokemon_pointer + 2 - 6]
-							if((level > 0 or level <= 100) and em[pokemon_pointer + 2 - 6 + 1] == 0):
+							if((level > 0 and level <= 100 and level <= game_max_level) and em[pokemon_pointer + 2 - 6 + 1] == 0):
 								#print("Found an 8 that was encoded as 14")
 								pokemon_pointer -= 6
 								
@@ -203,14 +208,14 @@ def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool,
 					elif(pokemon_length == 16):
 						#check if 14 works
 						level = em[pokemon_pointer + 2 - 2]
-						if((level > 0 or level <= 100) and em[pokemon_pointer + 2 - 2 + 1] == 0):
+						if((level > 0 and level <= 100 and level <= game_max_level) and em[pokemon_pointer + 2 - 2 + 1] == 0):
 							#print("Found a 14 that was encoded as 16")
 							pokemon_pointer -= 2
 						
 						#otherwise check if 8 works
 						else:
 							level = em[pokemon_pointer + 2 - 8]
-							if((level > 0 or level <= 100) and em[pokemon_pointer + 2 - 8 + 1] == 0):
+							if((level > 0 and level <= 100 and level <= game_max_level) and em[pokemon_pointer + 2 - 8 + 1] == 0):
 								#print("Found an 8 that was encoded as 16")
 								pokemon_pointer -= 8
 								
@@ -219,17 +224,17 @@ def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool,
 						#check if 14 works (check this first, in this case, if 14 is also wrong it will be the low EV value, which is rarely if ever in the level range, while if 16 is wrong it will be the low index value, which is often in the level range
 						
 						level = em[pokemon_pointer + 2 + 6]
-						if((level > 0 or level <= 100) and em[pokemon_pointer + 2 + 6 + 1] == 0):
+						if((level > 0 and level <= 100 and level <= game_max_level) and em[pokemon_pointer + 2 + 6 + 1] == 0):
 							#print("Found a 14 that was encoded as 8")
 							pokemon_pointer += 6
 						
 						#otherwise check if 16 works
 						else:
 							level = em[pokemon_pointer + 2 + 8]
-							if((level > 0 or level <= 100) and em[pokemon_pointer + 2 + 8 + 1] == 0):
+							if((level > 0 and level <= 100 and level <= game_max_level) and em[pokemon_pointer + 2 + 8 + 1] == 0):
 								#print("Found a 16 that was encoded as 8")
 								pokemon_pointer += 8
-					print("Modified Level to:", level)	
+					print("Found Level of:", level, "at", pokemon_pointer)	
 				
 				#final catch for incorrectly parsed Pokemon Data
 				try:
@@ -258,11 +263,11 @@ def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool,
 							#record pointer to current level
 							level_array.append(pokemon_pointer)
 					else:
-						print("Could not parse this Pokemon, skipping.")
+						#print("Could not parse this Pokemon, skipping.")
 						unparsable_pokemon[0] += 1
 						unparsable_pokemon.append(pokemon_pointer)
 				except:
-					print("Could not parse this Pokemon, skipping.")
+					#print("Could not parse this Pokemon, skipping.")
 					unparsable_pokemon[0] += 1
 					unparsable_pokemon.append(pokemon_pointer)
 				
@@ -282,25 +287,37 @@ def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool,
 		trainer_number += 1
 		gaia_double_error_check = True
 		
-		
-		#since each trainer-data has an end flag of 0x08, we just stop when the current trainer pointer + 39 is not 0x08
-		#Some hacks seems to have 0x02 and 0x09 end flags as well. The 0x09 uses the lowest byte for larger pointers.
-		
-		
 			
-		if(em[trainer_pointer + 39] != 2 and em[trainer_pointer + 39] != 8 and em[trainer_pointer + 39] != 9):
-			#USGS has garbage data in the middle, ignore that by skipping two more
-			if(gen_number == 3.12 and trainer_pointer < 2389607):
-				trainer_pointer += 80 #0x28
-				trainer_number += 2
+		#since each trainer-data has an end flag of 0x08, we just stop when the current trainer pointer + 39 is not 0x08
+		#Some hacks seems to have 0x02 and 0x09 end flags as well. The 0x09 uses the lowest byte for larger pointers.			
+
+		#USGS has garbage data in the middle, ignore that by skipping
+		while True:
+			#trainer number 403 breaks things in Nameless Fire Red
+			if(gen_number == 3.13 and trainer_number == 403):
+				trainer_pointer += 40
+				trainer_number += 1
+			#break if we're good
+			elif(not(em[trainer_pointer + 39] != 2 and em[trainer_pointer + 39] != 8 and em[trainer_pointer + 39] != 9)):
+				break
+			#otherwise try next
+			elif((gen_number == 3.12 and trainer_pointer < 2389607) or (gen_number == 3.13 and trainer_pointer < 2375345)):
+				trainer_pointer += 40 #0x28
+				trainer_number += 1
+			#otherwise found all the trainers
 			else:
 				print("First non-end flag at", trainer_pointer + 39)
 				print(trainer_number - 1, "trainers")
+				end_loop_flag = True
 				break
+		if(end_loop_flag):
+			break
 		if(gen_number == 3.12 and trainer_number > 873):
 			print("First non-end flag at", trainer_pointer + 39)
 			print(trainer_number - 1, "trainers")
 			break
+			
+
 		
 	#this is for Gaia for now, the Pokemon greater than 60 aren't available yet
 	if(gen_number == 3.11):
@@ -394,38 +411,41 @@ def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool,
 			level = em[pointer + 2]
 			
 			#get new level from lookup table
-			if(scale_bool):	
-				level = change_table[level]
+			try:
+				if(scale_bool):	
+					level = change_table[level]
 					
-			#If the Pokemon should be evolved, evolve it. Will evolve any unevolved Pokemon that is above the minimum level
-			
-			index = em[pointer + 4] + 256*em[pointer + 5]
-			
-			#If the Pokemon is past the level it evolves at by level-up
-			try:	
-				if(level >= evolve_level_barrier_array_iii[index] and evolve_bool):
-					new_index = evolve_array_iii[index]
-					if(new_index != index):
-						
-						#convert back to hex pairs & write
-						em[pointer + 4] = new_index%256
-						try:
-							em[pointer + 5] = int((new_index)/256)
-						#the above throws an error if the high bytes are 0
-						except:
-							em[pointer + 5] = 0
-						modify_count[0] += 1
+				#If the Pokemon should be evolved, evolve it. Will evolve any unevolved Pokemon that is above the minimum level
+				
+				index = em[pointer + 4] + 256*em[pointer + 5]
+				
+				#If the Pokemon is past the level it evolves at by level-up
+				try:	
+					if(level >= evolve_level_barrier_array_iii[index] and evolve_bool):
+						new_index = evolve_array_iii[index]
+						if(new_index != index):
+							
+							#convert back to hex pairs & write
+							em[pointer + 4] = new_index%256
+							try:
+								em[pointer + 5] = int((new_index)/256)
+							#the above throws an error if the high bytes are 0
+							except:
+								em[pointer + 5] = 0
+							modify_count[0] += 1
+						else:
+							modify_count[1] += 1
 					else:
 						modify_count[1] += 1
-				else:
-					modify_count[1] += 1
-				#write level now, so that if the index doesn't make sense, we don't write anything
-				if(scale_bool):
-					em[pointer + 2] = level
-			
+					#write level now, so that if the index doesn't make sense, we don't write anything
+					if(scale_bool):
+						em[pointer + 2] = level
+				
+				except:
+					print("Error at ",pointer, index)
 			except:
-				print("Error at ",pointer, index)
-		
+				print("Error at", pointer)
+			
 		print("Evolved", modify_count[0], "out of", modify_count[0] + modify_count[1], "Pokemon")
 		
 		if(unparsable_pokemon[0] > 0):
