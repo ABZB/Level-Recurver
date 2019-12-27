@@ -1,6 +1,7 @@
 from gen_iii_booster import *
 from gen_iv_booster import *
 from gen_v_booster import *
+from gen_vi_booster import *
 from gen_vii_booster import *
 
 #takes in bytearray, saves bytes to file
@@ -102,7 +103,7 @@ def main(gen_number, ai_bool = False, double_bool = False, double_all_bool = Fal
 			
 			save_binary_file(trpoke, 'root/poketool/trainer/trpoke', output_path)
 			
-	
+	#B2W2
 	elif(gen_number == 5.1):
 	
 		trdata, trpoke, output_path = get_files_gen_v(gen_number)
@@ -112,8 +113,18 @@ def main(gen_number, ai_bool = False, double_bool = False, double_all_bool = Fal
 			save_binary_file(trdata, '1.narc', output_path)
 		if(scale_bool):
 			save_binary_file(trpoke, '2.narc', output_path)
-			
+		
+	#XY
+	elif(gen_number == 6.0):
 	
+		trdata, trpoke, output_path = get_files_gen_vi(gen_number)
+		trpoke, trdata = calc_vi(trdata, trpoke, scale_bool)
+
+		save_binary_file(trdata, '8', output_path)
+		if(scale_bool):
+			save_binary_file(trpoke, '0', output_path)
+
+	#USUM
 	elif(gen_number == 7.1):
 	
 		trdata, trpoke, output_path = get_files_gen_vii(gen_number)
@@ -223,6 +234,10 @@ def main_menu():
 	row_iter += 1
 	
 	Button(master, text = 'Black2/White2', command = lambda: main('5.1', ai_bool.get(), double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
+	
+	row_iter += 1
+	
+	Button(master, text = 'X/Y', command = lambda: main('6.0', ai_bool.get(), double_bool.get(), double_all_bool.get(), mix_it_up_bool.get(), scale_bool.get(), custom_offset.get(), evolve_bool.get()), height = 2, width = 50, pady = 1).grid(row = row_iter)
 	
 	row_iter += 1
 	
