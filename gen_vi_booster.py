@@ -9,6 +9,7 @@ def calc_vi(trdata, trpoke, scale_bool):
 	pointer_data = 0
 	pointer_poke = 0
 	trainer_number = 1
+	trainer_array = []
 	doubled_count = 0
 	
 	pokemon_offset_array = [0]
@@ -61,6 +62,7 @@ def calc_vi(trdata, trpoke, scale_bool):
 			#write offset of next Pokemon
 			pokemon_offset_array.append(pokemon_relative_offset)
 			number_pokemon -= 1
+			trainer_array.append(trainer_number)
 		
 		if(trainer_number == max_trainer_index):
 			break
@@ -73,35 +75,57 @@ def calc_vi(trdata, trpoke, scale_bool):
 		pokemon_count = 0
 		
 		adjustment = 0
-		strikes = 0
 		while True:
+			do_not_modify = False
 			#point to next level
 			pointer_poke = 15872 + pokemon_offset_array[pokemon_count] + adjustment + 2
 			level = trpoke[pointer_poke]
 			
-			if(level <= 0 or level >= 100):
-				print("Read nonsense level of", level, "at", pointer_poke)
-				if(strikes == 0):
-					adjustment +=2
-					strikes += 1
-					print("Trying level of", level, "at", pointer_poke + adjustment)
-				elif(strikes == 1):
-					adjustment -= 2 + 2
-					print("Trying level of", level, "at", pointer_poke + adjustment)
-					strikes += 1
+			temp_pointer = pointer_poke
+			
+			tries = 0
+			movement = 0
+			while True:
+				#should be less or equal to 0x32 = 50
+				behind_1 = 	trpoke[pointer_poke - 1]
+				
+				#should be 0
+				ahead_1 = trpoke[pointer_poke + 1]
+				
+				#sum should be greater than 0
+				ahead_2 = trpoke[pointer_poke + 2]
+				ahead_3 = trpoke[pointer_poke + 3]
+				
+				#usually 0
+				ahead_4 = trpoke[pointer_poke + 4]
+				
+				#should be 0
+				ahead_5 = trpoke[pointer_poke + 5]
+				
+				if(behind_1 <= 50 and ahead_1 == 0 and (ahead_2 + ahead_3) > 0 and ahead_5 == 0 and level <= 100 and level > 0):
+					adjustment += movement
+					break
 				else:
-					pokemon_count += 1
-					print("Failed to find level, for certain")
-					strikes = 0
-			else:
-				strikes = 0
+					tries += 1
+					#generates sequence +1, -1, +2, -2, etc.
+					movement = (-1)**(tries + 1)*round(tries/2)
+					pointer_poke = temp_pointer + movement
+					level = trpoke[pointer_poke]
+					#print(trainer_array[pokemon_count], tries, movement, pointer_poke, level)
+					#If we haven't found the correct address yet, we're possibly going to end up possibly hitting the previous Pokemon twice, or hitting
+					if(tries >= 8):
+						print('Utter failure', trainer_array[pokemon_count], pointer_poke, level)
+						pointer_poke = temp_pointer
+						do_not_modify = True
+						break
+				
+			if(not(do_not_modify)):
 				new_level = min(round(level*1.18), 100)
 				trpoke[pointer_poke] = new_level
-				print(level, "mapped to", new_level)
-				pokemon_count += 1
+			#print(level, "mapped to", new_level)
+			pokemon_count += 1
 			if(pokemon_count >= total_pokemon):
 				break
-
 
 	return(trpoke, trdata)
 
