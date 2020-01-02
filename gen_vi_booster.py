@@ -70,7 +70,11 @@ def calc_vi(trdata, trpoke, scale_bool):
 			trainer_number += 1
 			pointer_data += 20
 	
+	level_pointer_array = []
+	level_array = []
+	
 	if(scale_bool):
+		max_level_array = [50,1]
 		total_pokemon = len(pokemon_offset_array) - 1
 		pokemon_count = 0
 		
@@ -118,20 +122,42 @@ def calc_vi(trdata, trpoke, scale_bool):
 						pointer_poke = temp_pointer
 						do_not_modify = True
 						break
+			
+			#get a sort-of average of highest levels
+			if(level > max_level_array[0]/max_level_array[1]  and level < 100):
+				max_level_array[0] += level
+				max_level_array[1] += 1
 				
-			if(not(do_not_modify)):
-				new_level = min(round(level*1.18), 100)
-				trpoke[pointer_poke] = new_level
-			#print(level, "mapped to", new_level)
+			#record where the level actually is
+			level_pointer_array.append(pointer_poke)
+			level_array.append(level)
+			
 			pokemon_count += 1
 			if(pokemon_count >= total_pokemon):
 				break
-
+		
+		#compute new level curve
+		level_to_100 = max_level_array[0]/max_level_array[1]
+		#avoid divide by zero, in this case rescaling is minimal anyway
+		if(level_to_100 == 100):
+			level_to_100 = 99
+		
+		curve_exponent = 0.35
+		
+		curve_divisor = level_to_100**(1+curve_exponent)/(100 - level_to_100)
+		print('Level', 'New Level')
+		for j in range(1,100):
+			print(j, '|', min(round(j*(1 + (j**curve_exponent)/curve_divisor)), 100))
+		
+		#Modify the levels
+		for j in range(len(level_array)):
+			trpoke[level_pointer_array[j]] = min(round(level_array[j]*(1 + (level_array[j]**curve_exponent)/curve_divisor)), 100)
+		
 	return(trpoke, trdata)
 
 def get_files_gen_vi(gen_number):
 
-	#for B2W2, trdata is a091, trpoke is a092
+	#for XY, trdata is a038, trpoke is a040
 	
 	#get hex file locations:
 	if(gen_number == 6.0):
