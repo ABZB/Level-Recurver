@@ -326,7 +326,7 @@ def get_files_gen_iv(gen_number):
 	#Platinum
 	elif(gen_number == 4.1):
 		trdata_location = askopenfilename(filetypes = (("Select root/poketool/trainer/trdata", "*.*"), ("All Files", "*.*")))
-		trdpoke_location = askopenfilename(filetypes = (("Select root/poketool/trainer/trpoke", "*.*"), ("All Files", "*.*")))
+		trpoke_location = askopenfilename(filetypes = (("Select root/poketool/trainer/trpoke", "*.*"), ("All Files", "*.*")))
 		
 
 	trpoke = bytearray()
