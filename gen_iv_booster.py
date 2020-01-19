@@ -122,7 +122,6 @@ def calc_iv(trdata, trpoke, gen_number, double_bool, scale_bool):
 		
 		if(trainer_number == max_trainer):
 			break
-	
 	if(scale_bool):
 	
 		#same pre-flag as before, with different preceding offset
@@ -161,13 +160,11 @@ def calc_iv(trdata, trpoke, gen_number, double_bool, scale_bool):
 					print("two ahead good", level1, "replacing", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
 					level = level1
 					pointer_poke += 2
-					break
 				#two behind is good but two ahead is not
 				elif((level1 == 0 or level1 >= 100) and (level2 > 0 and level2 <= 100)):
 					print("two behind good", level2, "replacing", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
 					level = level2
 					pointer_poke -= 2
-					break
 				#both good
 				else:
 					print("Both make sense, check manually", level1, level2, "error value", level, "at trainer", 1+trainer_array[pokemon_count][0], "address", pointer_poke)
@@ -230,7 +227,7 @@ def calc_iv(trdata, trpoke, gen_number, double_bool, scale_bool):
 			#initial scaling of all Pokemon
 			pokemon_count = 0
 			while True:
-			
+
 				level = edit_array[pokemon_count][0]
 				
 				while True:
