@@ -17,38 +17,43 @@ Loop, 813
 
 	;get trainer name
 	Send ^{c}
+	Sleep 2
 	trainer_name := Trim(clipboard)
+	Sleep 2
 	
+	; 1 tab backward to AI
 	
-	; 13 tabs to AI numberdo it in pieces b/c otherwise BWTE gets upset
-	
-	Loop, 13
-	{
-		Send {tab}
-		Sleep 1
-	}
+
+		Send +{tab}
+		Sleep 2
+
 	
 	; get AI into clipboard
 	Send ^{c}
-	
+	Sleep 2
 	ai := Trim(clipboard)
-	
+	Sleep 2
 	if(ai = "128" or ai = "129" or ai = "135" or ai = 128 or ai = 129 or ai = 135)
 	{
+		Sleep 2
 		; go back 2 to Battle Type
 		Send +{tab}
+		Sleep 2
+		Send +{tab}
+		Sleep 2
 		
 		; get Battle Type into clipboard
 		Send ^{c}
+		Sleep 2
 		bttl_typ := Trim(clipboard)
-
+		Sleep 2
 		if(bttl_typ = "Single Battle")
 		{
 			;go back to party count
-			Loop, 8
+			Loop, 6
 			{
-				Send +{tab}
-				Sleep 1
+				Send {tab}
+				Sleep 2
 			}
 			
 			;set to 3
@@ -58,44 +63,44 @@ Loop, 813
 	else
 	{
 		; otherwise set party count as follows: {1,2} -> 3, {3} -> 4, {5} -> 6
-			Loop, 10
+			Loop, 4
 			{
-				Send +{tab}
-				Sleep 1
+				Send {tab}
+				Sleep 2
 			}
 		
 		Send ^{c}
-		Sleep 1
+		Sleep 2
 		prty_cnt := Trim(clipboard)
 		;MsgBox % prty_cnt
 		
 		;if it's the first rival battle, do nothing
 		if(prty_cnt = 1 or prty_cnt = 2 or prty_cnt = "1" or prty_cnt = "2")
 		{
-			if(trainer_name = 'Hugh - 161' or trainer_name = 'Hugh - 162'  or trainer_name = 'Hugh - 163')
+			if(trainer_name = "Hugh - 161" or trainer_name = "Hugh - 162"  or trainer_name = "Hugh - 163" or trainer_name= "N - 6" or trainer_name= "N - 5")
 			{
-				Sleep 1
+				Sleep 2
 			}
 			else
 			{
 				Send {3}
-				Sleep 1
+				Sleep 2
 			}
 		}
 		else if(prty_cnt = 3 or prty_cnt = "3")
 		{
 			Send {4}
-			Sleep 1
+			Sleep 2
 		}
 		else if(prty_cnt = 4 or prty_cnt = "4")
 		{
 			Send {5}
-			Sleep 1
+			Sleep 2
 		}
 		else if(prty_cnt = 5 or prty_cnt = "5")
 		{
 			Send {6}
-			Sleep 1
+			Sleep 2
 		}
 		
 	
@@ -103,17 +108,17 @@ Loop, 813
 	
 	; move to save trainer button and save
 	Send +{tab 2}
-	Sleep 1
+	Sleep 2
 	
 	Send {Space}
-	Sleep 1
+	Sleep 2	
 	
 	; return to trainer selection dropdown and move down by one
 	Send +{tab}
-	Sleep 20
+	Sleep 10
 	
 	Send {Down}
-	Sleep 1
+	Sleep 5
 	
 }
 return
