@@ -70,15 +70,16 @@ def calc_iv(trdata, trpoke, gen_number, double_bool, scale_bool):
 		number_pokemon = trdata[pointer_data + 3] & 7
 	
 		
-		#write as many skips as the trainer has Pokemon
-		pokemon_count = 0
-		while True:
-			trainer_array.append([trainer_number, skip_number])
-			pokemon_count += 1
-			if(pokemon_count == number_pokemon):
-				break
+		#write as many skips as the trainer has Pokemon. If trainer has 0 Pokemon, skip
+		if(number_pokemon != 0):
+			pokemon_count = 0
+			while True:
+				trainer_array.append([trainer_number, skip_number])
+				pokemon_count += 1
+				if(pokemon_count == number_pokemon):
+					break
 		
-		trainer_bump.append(0)
+			trainer_bump.append(0)
 		
 		if(double_bool):
 			#don't bother looking further if can't be a double battle anyway
@@ -119,7 +120,7 @@ def calc_iv(trdata, trpoke, gen_number, double_bool, scale_bool):
 		
 		trainer_number += 1
 		pointer_data += 20
-		
+		print(trainer_number)
 		if(trainer_number == max_trainer):
 			break
 	if(scale_bool):
