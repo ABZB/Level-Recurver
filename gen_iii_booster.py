@@ -363,9 +363,9 @@ def calc_iii(em, ai_bool, double_bool, double_all_bool, scale_bool, evolve_bool,
 				print(len(temp), "Pokemon.")
 				print("The new median is", medmaxarr, ".")
 		
-		curve_exponent_50 = 0.5
+		curve_exponent_50 = 0.25
 		
-		curve_divisor_50 = level_to_50**(1+curve_exponent_50)/(50 - level_to_50)
+		curve_divisor_50 = level_to_50**(1+curve_exponent_50*2)/(50 - level_to_50)
 		
 		
 		
