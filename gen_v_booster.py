@@ -19,19 +19,35 @@ def calc_v(trdata, trpoke, double_bool, double_all_bool, mix_it_up_bool, scale_b
 	trainer_number = 1
 
 	
-	#Search for 47 4D 49 46, which always precedes a series of 00 prior to first trainer.
-	#check if using an extended trainer index
-
-	
-	
-	#current integer byte-offset for TRdata
+	#Search for 0x47 4D 49 46, pointer should be the address of 0x47 plus 0x18 = 24.
+	try:
+		for j in range(len(trdata)):
+				if(trdata[j] == 71 and trdata[j + 1] == 77 and trdata[j + 2] == 73 and trdata[j + 3] == 70):
+					pointer_data = j+24
+	#did not find, give up and use default
+	except:
 	#TRdata, start from 0x19B4 = 6580
-	pointer_data = 6580
-	max_trainer_index = 813
+		#current integer byte-offset for TRdata
+		pointer_data = 6580
+		
+	
+	#Fixes BlazeWhite2/VoltBlack2, they need to go forwards a few bytes
+	while(trdata[pointer_data] != 0 or trdata[pointer_data+1] != 6):
+		pointer_data +=1
+	
+	#sets proper bound for BW2VB2
+	if(pointer_data == 6824):
+		max_trainer_index = 843
+		#First Pokemon is at 0x1B00
+		pointer_poke = 6912 + 2 #first level at 0x1B02 = 6914
+	else:
+		max_trainer_index = 813
+	#check if using an extended trainer index (add later)
 	
 	#will have bump at the trainer number location
 	trainer_bump = []
 	
+	print("Trainer Pointer starts from: ", pointer_data)
 	
 	#parse trdata
 	while True:
@@ -45,11 +61,13 @@ def calc_v(trdata, trpoke, double_bool, double_all_bool, mix_it_up_bool, scale_b
 			skip_number += 8
 		#if items
 		if(extra_space_bool & 2 == 2):
+			#Pokemon Trainer N gets an extra 2 for some reason
+			if(trdata[pointer_data+1] == 40):
+				skip_number += 2
 			skip_number += 2
 		
 		#get # of Pokemon, which is the 3rd hex pair on
 		number_pokemon = trdata[pointer_data + 3] & 7
-		
 		
 		#Do battle-type modifying here:
 		
@@ -72,7 +90,7 @@ def calc_v(trdata, trpoke, double_bool, double_all_bool, mix_it_up_bool, scale_b
 					trdata[pointer_data + 2] += 1
 				#otherwise, randomly assign one of the battle types other than double
 				elif(number_pokemon > 2):
-					temp = random.randint(1,3)
+					temp = random.randint(0,2)
 					#if the outcome is not Double, set battle type to that (definitely won't cause a crash)
 					if(temp != 1):
 						trdata[pointer_data + 2] += temp
@@ -122,45 +140,15 @@ def calc_v(trdata, trpoke, double_bool, double_all_bool, mix_it_up_bool, scale_b
 		#sum, number
 		max_level_array = [50,1]
 		
+		level = 0
 		#pull all the levels, check that they are good:
 		while True:
-			
 			while True:
 				level = trpoke[pointer_poke]
 				if(level == 0 or level > 100):
 					#For some reason, some trainer have an FF FF after their last Pokemon. This checks for that
-					if(level == 255):
-						#If so, need to advance pointer by 2 
-						if(trpoke[pointer_poke + 1] == 255):
-							pointer_poke += 4
-							print("Pointer advanced by 2 due to FF FF at at trainer", trainer_array[pokemon_count][0], "address", pointer_poke)
-						#If so, need to advance pointer by 1
-						elif(trpoke[pointer_poke - 1] == 255):
-							pointer_poke += 3
-							print("Pointer advanced by 1 due to FF FF at at trainer", trainer_array[pokemon_count][0], "address", pointer_poke)
-				
-					else:
-						level1 = trpoke[pointer_poke+2]
-						level2 = trpoke[pointer_poke-2]
-						print("trying", level1, level2)
-						
-						if((level1 == 0 or level1 > 100) and (level2 == 0 or level2 > 100)):
-							print("cannot fix")
-							print("problem at trainer", trainer_array[pokemon_count][0], "getting value", level, "at", pointer_poke)
-						#two ahead is good but two behind is not
-						elif((level1 > 0 and level1 <= 100) and (level2 == 0 or level2 > 100)):
-							print("two ahead good", level1, "replacing", level, "at trainer", trainer_array[pokemon_count][0], "address", pointer_poke)
-							level = level1
-							pointer_poke += 2
-						#two behind is good but two ahead is not
-						elif((level1 == 0 or level1 > 100) and (level2 > 0 and level2 <= 100)):
-							print("two behind good", level2, "replacing", level, "at trainer", trainer_array[pokemon_count][0], "address", pointer_poke)
-							level = level2
-							pointer_poke -= 2
-						#both good
-						else:
-							print("Both make sense, check manually", level1, level2, "error value", level, "at trainer", trainer_array[pokemon_count][0], "address", pointer_poke)
-							level = min(level1, level2)
+					#in B2W2, it seems the only oddity is sometimes an extra two empty bytes?
+					pointer_poke += 2
 				else:
 					break
 			
@@ -179,8 +167,12 @@ def calc_v(trdata, trpoke, double_bool, double_all_bool, mix_it_up_bool, scale_b
 			else:
 				#move to the next pokemon
 				pointer_poke += trainer_array[pokemon_count][1]
+				if(pointer_poke > len(trpoke) - 1):
+					total_pokemon -= 1
+					break
 				#increment the pokemon count
 				pokemon_count += 1
+				#print(round(pokemon_count/total_pokemon,2))
 		
 		
 		
